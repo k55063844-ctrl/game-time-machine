@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>游戏时光机 · UI 重构方向预览</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: #202723;
+      background: #e9e6dd;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #e9e6dd; }
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+    .preview-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr);
+      gap: 28px;
+      align-items: end;
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 34px 28px 20px;
+      border-bottom: 1px solid #c7c3b8;
+    }
+    .preview-head small {
+      display: block;
+      margin-bottom: 10px;
+      color: #9b493a;
+      font: 700 11px/1.2 ui-monospace, "SFMono-Regular", Consolas, monospace;
+      letter-spacing: .12em;
+    }
+    .preview-head h1 { margin: 0; font-size: clamp(30px, 4vw, 56px); font-weight: 650; line-height: 1.08; }
+    .preview-head p { margin: 0; color: #68706b; font-size: 14px; line-height: 1.8; }
+    #design-dials.qmdp-dials {
+      border-bottom-color: #c8c4b9;
+      background: rgba(241, 239, 232, .98);
+    }
+    #design-dials .qmdp-dial { color: #303632; }
+    #design-dials input { accent-color: #ad4c38; }
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+    .direction {
+      min-width: 0;
+      overflow: hidden;
+      background: #f5f3ed;
+      border: 1px solid #c9c5bb;
+      box-shadow: 0 12px 34px rgba(41, 43, 38, .08);
+      transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+    }
+    .direction:hover { transform: translateY(-2px); box-shadow: 0 18px 44px rgba(41, 43, 38, .12); }
+    .direction.qmdp-selected { border-color: #202723; box-shadow: 0 0 0 3px #202723, 0 18px 44px rgba(41, 43, 38, .16); }
+    .viewport { position: relative; height: 390px; overflow: hidden; border-bottom: 1px solid #c9c5bb; }
+    .stage {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 760px;
+      height: 430px;
+      transform: translate(-50%, -50%) scale(.83);
+      transform-origin: center;
+      overflow: hidden;
+      font-style: normal;
+    }
+    .stage *, .stage *::before, .stage *::after { box-sizing: border-box; font-style: normal; }
+    .direction-meta { display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: center; padding: 18px 20px 20px; }
+    .direction-title { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .direction-title b { font: 700 12px ui-monospace, monospace; color: #8c4437; }
+    .direction-title h2 { margin: 0; font-size: 18px; font-weight: 650; }
+    .recommended { padding: 3px 7px; color: #f4efe3; background: #2d4d40; font-size: 10px; font-weight: 700; }
+    .direction-meta p { max-width: 46em; margin: 0; color: #6e746f; font-size: 12px; line-height: 1.65; }
+    .direction-meta .qmdp-pick-button {
+      min-width: 168px;
+      min-height: 44px;
+      padding: 0 15px;
+      color: #f5f2e9;
+      background: #202723;
+      border: 1px solid #202723;
+      border-radius: 2px;
+      font-size: 13px;
+      font-weight: 650;
+    }
+    .direction-meta .qmdp-pick-button:hover { background: #9f4635; border-color: #9f4635; }
+    .notes {
+      max-width: 1424px;
+      margin: 0 auto 42px;
+      padding: 22px 24px;
+      background: #dcd8cd;
+      border: 1px solid #c1bcb0;
+    }
+    .notes > p { margin: 0 0 16px; color: #555c57; font-size: 13px; line-height: 1.7; }
+    .notes-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+    .notes-grid div { padding-left: 14px; border-left: 3px solid #9b493a; }
+    .notes-grid b { display: block; margin-bottom: 5px; font-size: 12px; }
+    .notes-grid span { color: #69706b; font-size: 11px; line-height: 1.6; }
+
+    /* A — 时光机博物馆 */
+    .a-stage { --bone:#e9e2d2; --ink:#1e2925; --green:#587467; --red:#b64c38; --gold:#d0a741; color:var(--ink); background:var(--bone); border:1px solid #9d9789; }
+    .a-top { height:52px; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; padding:0 22px; border-bottom:1px solid #aaa394; background:#ded7c8; }
+    .a-brand { display:flex; align-items:center; gap:9px; font-size:14px; font-weight:700; }
+    .a-mark { display:grid; place-items:center; width:30px; height:30px; color:#eee6d6; background:var(--ink); font:700 10px ui-monospace,monospace; box-shadow:3px 3px 0 var(--red); }
+    .a-nav { display:flex; gap:22px; color:#667069; font-size:11px; }
+    .a-nav b { padding:17px 0 13px; color:var(--ink); border-bottom:3px solid var(--red); }
+    .a-open { justify-self:end; display:flex; align-items:center; gap:7px; font:600 9px ui-monospace,monospace; }
+    .a-open i { width:8px; height:8px; border-radius:50%; background:#679277; box-shadow:0 0 0 3px rgba(70,109,91,.15); }
+    .a-main { display:grid; grid-template-columns:.94fr 1.06fr; height:285px; }
+    .a-copy { position:relative; padding:32px 28px 25px; border-right:1px solid #aaa394; }
+    .a-index { display:flex; align-items:center; gap:10px; color:#706e65; font:600 9px ui-monospace,monospace; letter-spacing:.08em; }
+    .a-index span { padding:4px 7px; color:#f5eddd; background:var(--red); }
+    .a-copy h3 { margin:20px 0 12px; font-size:44px; font-weight:650; line-height:1.03; }
+    .a-copy h3 em { color:var(--red); font-style:normal; }
+    .a-copy p { width:29em; max-width:100%; margin:0; color:#626a64; font-size:12px; line-height:1.7; }
+    .a-action { display:flex; align-items:center; gap:14px; margin-top:20px; }
+    .a-action b { padding:10px 13px; color:#f3eddf; background:var(--ink); font-size:11px; box-shadow:4px 4px 0 var(--gold); }
+    .a-action span { color:#75796f; font:500 9px ui-monospace,monospace; }
+    .a-plate { position:absolute; right:16px; bottom:14px; padding:5px 8px; border:1px solid #8c877c; color:#686c66; font:600 8px ui-monospace,monospace; transform:rotate(-2deg); }
+    .a-machine-wrap { position:relative; background:#c9c8b9; }
+    .a-shadow { position:absolute; left:66px; right:48px; bottom:24px; height:22px; background:rgba(44,48,42,.18); border-radius:50%; filter:blur(8px); }
+    .a-machine { position:absolute; left:70px; top:21px; width:290px; height:246px; padding:18px 20px; background:#343e39; border:1px solid #1a211d; border-radius:18px 18px 30px 18px; box-shadow:8px 10px 0 #8d897d, 0 1px 0 #758078 inset; transform:rotate(1deg); }
+    .a-screw { position:absolute; width:8px; height:8px; border-radius:50%; background:#9a9c91; border:1px solid #171d19; }
+    .a-screw.one{left:9px;top:9px}.a-screw.two{right:9px;top:9px}.a-screw.three{right:11px;bottom:10px}
+    .a-label { display:flex; justify-content:space-between; margin-bottom:8px; color:#e0d9c8; font:600 8px ui-monospace,monospace; letter-spacing:.08em; }
+    .a-screen { height:137px; padding:9px; color:#17261e; background:#adc1a5; border:8px solid #202823; box-shadow:0 0 0 2px #59665f, 0 6px 12px rgba(0,0,0,.38) inset; }
+    .a-screen-head { display:flex; justify-content:space-between; font:700 8px ui-monospace,monospace; }
+    .a-playfield { position:relative; height:88px; margin-top:6px; border:1px solid rgba(22,42,31,.38); }
+    .a-block { position:absolute; width:12px; height:12px; background:#20372b; border:1px solid #abc1a7; }
+    .a-block.b1{left:38px;bottom:0}.a-block.b2{left:50px;bottom:0}.a-block.b3{left:50px;bottom:12px}.a-block.b4{left:62px;bottom:0}.a-block.b5{right:34px;top:25px;background:#a14534}.a-block.b6{right:46px;top:25px;background:#a14534}.a-block.b7{right:46px;top:13px;background:#a14534}
+    .a-controls { display:grid; grid-template-columns:70px 1fr 78px; align-items:center; gap:10px; padding-top:13px; }
+    .a-dpad { position:relative; width:54px; height:54px; background:linear-gradient(#171c19 0 0) center/18px 54px no-repeat,linear-gradient(#171c19 0 0) center/54px 18px no-repeat; filter:drop-shadow(0 3px 0 #0e110f); }
+    .a-speaker { display:grid; grid-template-columns:repeat(4,4px); justify-content:center; gap:5px; }
+    .a-speaker i { width:4px; height:13px; border-radius:4px; background:#1c2420; }
+    .a-buttons { display:flex; gap:10px; transform:rotate(-12deg); }
+    .a-buttons i { display:grid; place-items:center; width:31px; height:31px; border-radius:50%; color:#f1e8d7; background:var(--red); box-shadow:0 4px 0 #6e2c22; font:700 9px ui-monospace,monospace; }
+    .a-rack { height:93px; display:grid; grid-template-columns:110px 1.25fr 1fr 1fr; border-top:1px solid #aaa394; background:#e1dacb; }
+    .a-rack-title { padding:18px 16px; border-right:1px solid #aaa394; }
+    .a-rack-title small { color:#8d4739; font:700 8px ui-monospace,monospace; }
+    .a-rack-title strong { display:block; margin-top:6px; font-size:15px; }
+    .a-game { position:relative; padding:15px 14px; border-right:1px solid #b0aa9d; }
+    .a-game.active { color:#eee7d7; background:var(--green); }
+    .a-game span { color:inherit; opacity:.67; font:600 8px ui-monospace,monospace; }
+    .a-game b { display:block; margin-top:8px; font-size:12px; }
+    .a-game em { position:absolute; right:10px; bottom:12px; font:700 15px ui-monospace,monospace; }
+
+    /* B — 深夜街机厅 */
+    .b-stage { --coal:#10110f; --panel:#191a17; --paper:#e9e0ca; --amber:#d2a03d; --red:#a94b36; --green:#567261; color:var(--paper); background:var(--coal); border:1px solid #3a3b34; }
+    .b-top { height:52px; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; padding:0 22px; background:#151613; border-bottom:1px solid #3b3a32; }
+    .b-brand { display:flex; align-items:center; gap:10px; font-size:13px; font-weight:700; }
+    .b-mark { display:grid; place-items:center; width:30px; height:30px; color:#171710; background:var(--amber); box-shadow:3px 3px 0 #59451d; font:700 10px ui-monospace,monospace; }
+    .b-nav { display:flex; gap:24px; color:#aaa696; font-size:10px; }
+    .b-nav b { color:var(--paper); border-bottom:2px solid var(--amber); padding:17px 0 14px; }
+    .b-live { justify-self:end; color:#bcb7a7; font-size:9px; }.b-live i{display:inline-block;width:7px;height:7px;margin-right:7px;border-radius:50%;background:var(--red)}
+    .b-main { height:285px; display:grid; grid-template-columns:1.05fr .95fr; border-bottom:1px solid #3b3a32; }
+    .b-copy { padding:34px 30px; }
+    .b-kicker { color:#a9a493; font:600 8px ui-monospace,monospace; letter-spacing:.12em; }.b-kicker span{padding:4px 7px;margin-right:8px;color:#16160f;background:var(--amber)}
+    .b-copy h3 { margin:19px 0 13px; color:#f0e9d8; font-size:43px; line-height:1.03; font-weight:650; }
+    .b-copy p { width:28em; max-width:100%; margin:0; color:#a9a696; font-size:11px; line-height:1.72; }
+    .b-actions { display:flex; align-items:center; gap:16px; margin-top:20px; font-size:9px; color:#c4bead; }.b-actions b{padding:10px 13px;color:#17160f;background:var(--amber);box-shadow:4px 4px 0 #604a20;font-size:11px}
+    .b-stats { display:flex; gap:24px; margin-top:22px; padding-top:12px; border-top:1px solid #34352f; }.b-stats small{display:block;color:#77786d;font-size:8px}.b-stats strong{display:block;margin-top:4px;font:600 13px ui-monospace,monospace}
+    .b-cabinet-area { position:relative; background:#111612; }
+    .b-cabinet { position:absolute; left:64px; top:19px; width:300px; height:250px; overflow:hidden; background:#26251f; border:1px solid #565143; box-shadow:9px 11px 0 #070806; transform:rotate(1deg); }
+    .b-marquee { height:48px; display:flex; align-items:center; justify-content:space-between; padding:0 16px; color:#17160f; background:var(--amber); font-size:9px; }.b-marquee b{font-size:20px}
+    .b-screen { position:relative; height:144px; margin:11px 14px 0; overflow:hidden; background:#101a15; border:5px solid #080907; }
+    .b-screen-head { position:relative;z-index:3;display:flex;justify-content:space-between;padding:8px;color:#d9d4c5;font:600 8px ui-monospace,monospace}.b-screen-head b{color:var(--amber)}
+    .b-road { position:absolute; left:13%; right:13%; bottom:-20px; height:120px; background:#252721; border-left:16px solid #624e2e; border-right:16px solid #624e2e; clip-path:polygon(36% 0,64% 0,100% 100%,0 100%); }
+    .b-line { position:absolute; left:50%; bottom:0; width:3px; height:88%; background:repeating-linear-gradient(0deg,#c2b999 0 14px,transparent 14px 27px); }
+    .b-car { position:absolute; z-index:2; bottom:13px; right:27%; width:36px; height:52px; display:grid; place-items:center; color:#17160f; background:var(--amber); border:2px solid #f0c56c; font:700 8px ui-monospace,monospace; }
+    .b-rival { position:absolute;z-index:2;top:60px;left:34%;width:24px;height:34px;display:grid;place-items:center;background:var(--red);font:700 7px ui-monospace,monospace}
+    .b-warning { position:absolute; right:7px; bottom:7px; z-index:4; padding:4px 6px; background:var(--red); font-size:7px; }
+    .b-controls { height:47px; display:flex; align-items:center; gap:9px; padding:7px 17px; }.b-stick{position:relative;width:31px;height:16px;border-radius:50%;background:#0c0d0b}.b-stick:before{content:"";position:absolute;left:14px;bottom:6px;width:4px;height:24px;background:#aaa18d;transform:rotate(-10deg)}.b-stick:after{content:"";position:absolute;left:10px;top:-15px;width:12px;height:12px;border-radius:50%;background:var(--red)}.b-key{display:grid;place-items:center;width:27px;height:27px;border-radius:50%;color:#17160f;background:var(--amber);box-shadow:0 3px 0 #070806;font:700 8px ui-monospace,monospace}.b-controls small{margin-left:auto;color:#8f8b7e;font-size:7px}
+    .b-shelf { height:93px; display:grid; grid-template-columns:115px 1.25fr 1fr; background:#dfd6c1; color:#1c1d19; }
+    .b-shelf-title { padding:17px; border-right:1px solid #aaa18f; }.b-shelf-title small{color:#7b6030;font:700 8px ui-monospace,monospace}.b-shelf-title b{display:block;margin-top:8px;font-size:15px}
+    .b-game { position:relative; padding:14px 16px; border-right:1px solid #aaa18f; }.b-game.dark{color:#ece4d2;background:#20211d}.b-game.green{color:#eee6d4;background:#3e5145}.b-game span{font-size:8px;opacity:.65}.b-game h4{margin:8px 0 4px;font-size:13px}.b-game p{margin:0;font-size:8px;opacity:.65}.b-game b{position:absolute;right:12px;bottom:11px;color:var(--amber);font-size:9px}
+
+    /* C — 频道 180 */
+    .c-stage { --ink:#101923; --navy:#172b3d; --paper:#eee8d8; --red:#c74832; --cyan:#76c8bd; --yellow:#e8bc45; color:var(--paper); background:var(--ink); border:1px solid #56616a; }
+    .c-top { height:52px; display:grid; grid-template-columns:190px 1fr 110px; color:var(--ink); background:var(--paper); border-bottom:4px solid var(--red); }
+    .c-brand { display:flex; align-items:center; gap:11px; padding:0 16px; color:#fff7e7; background:var(--red); }.c-brand b{font:900 21px Arial,sans-serif;letter-spacing:.08em}.c-brand span{font-size:10px;font-weight:700}
+    .c-ticker { display:flex; align-items:center; gap:12px; padding:0 16px; font-size:10px; }.c-ticker em{padding:4px 7px;color:var(--paper);background:var(--ink)}.c-ticker small{margin-left:auto;color:#697078;font:600 8px ui-monospace,monospace}
+    .c-clock { display:grid;place-items:center;border-left:1px solid #b7b1a2;font:600 11px ui-monospace,monospace; }
+    .c-main { height:285px; display:grid; grid-template-columns:.9fr 1.1fr; }
+    .c-copy { position:relative; padding:29px 28px 61px; background:var(--navy); border-right:5px solid var(--red); }
+    .c-eyebrow { color:var(--cyan);font:600 8px ui-monospace,monospace;letter-spacing:.1em}.c-eyebrow b{margin-left:8px;padding:3px 6px;color:var(--ink);background:var(--yellow)}
+    .c-copy h3 { margin:17px 0 10px; font-size:42px; line-height:1; font-weight:650; }.c-copy p{width:27em;max-width:100%;margin:0;color:rgba(238,232,216,.7);font-size:10px;line-height:1.7}
+    .c-action { display:flex;align-items:center;gap:13px;margin-top:17px}.c-action b{padding:9px 12px;color:#fff;background:var(--red);box-shadow:4px 4px 0 var(--yellow);font-size:10px}.c-action span{color:#99a6a7;font:600 8px ui-monospace,monospace}
+    .c-lower { position:absolute; left:0;right:0;bottom:0;height:48px;display:grid;grid-template-columns:76px 1fr;align-items:center;padding:0 15px;color:var(--ink);background:var(--paper); }.c-lower b{align-self:stretch;display:grid;place-items:center;margin-left:-15px;color:#fff;background:var(--red);font-size:9px}.c-lower span{padding-left:13px;font-size:12px;font-weight:700}
+    .c-live { position:relative; overflow:hidden; background:#7fb3ad; }
+    .c-live-head { position:absolute;z-index:5;top:11px;left:12px;right:12px;display:flex;align-items:center;gap:8px;color:#fff;font-size:8px}.c-live-head b{padding:4px 6px;background:var(--red)}.c-live-head span:last-child{margin-left:auto;font:600 8px ui-monospace,monospace}
+    .c-sun { position:absolute;top:50px;right:17%;width:49px;height:49px;border-radius:50%;background:var(--yellow) }
+    .c-mountain { position:absolute; left:-3%;right:-3%;bottom:82px;height:95px;background:#4c7069;clip-path:polygon(0 100%,18% 35%,34% 74%,55% 15%,74% 68%,87% 30%,100% 100%); }
+    .c-road { position:absolute;left:5%;right:5%;bottom:-38px;height:170px;background:#253139;clip-path:polygon(37% 0,63% 0,100% 100%,0 100%);border-top:4px solid var(--paper)}
+    .c-road i { position:absolute;left:50%;width:3px;height:100%;background:repeating-linear-gradient(180deg,var(--paper) 0 14px,transparent 14px 30px)}
+    .c-car { position:absolute;z-index:3;right:19%;bottom:28px;width:74px;height:38px;display:grid;place-items:center;color:#fff;background:var(--red);border:3px solid var(--ink);box-shadow:7px 8px 0 rgba(16,25,35,.32);font:900 11px Arial,sans-serif }
+    .c-data { position:absolute;left:0;right:0;bottom:0;height:54px;display:grid;grid-template-columns:repeat(3,1fr);background:var(--ink)}.c-data div{display:grid;align-content:center;padding:7px 11px;border-right:1px solid rgba(238,232,216,.25)}.c-data small{color:var(--cyan);font-size:7px}.c-data strong{font:700 18px ui-monospace,monospace}
+    .c-schedule { height:93px; padding:13px 15px; color:var(--ink); background:var(--paper); border-top:5px solid var(--red); }
+    .c-schedule-head { display:flex;justify-content:space-between;align-items:end;margin-bottom:8px}.c-schedule-head span{color:var(--red);font:700 7px ui-monospace,monospace}.c-schedule-head b{font-size:13px}.c-programs{display:grid;grid-template-columns:1.2fr .8fr 1fr;gap:6px}.c-program{min-height:48px;padding:8px;color:var(--paper);background:var(--navy);border-top:4px solid var(--cyan)}.c-program.red{background:var(--red);border-top-color:var(--yellow)}.c-program.cream{color:var(--ink);background:#d8d0b8;border-top-color:var(--red)}.c-program small{font-size:7px}.c-program b{display:block;margin-top:6px;font-size:10px}
+
+    /* D — 精密玩具实验室 */
+    .d-stage { --ink:#252b28; --muted:#69716c; --plastic:#e9e4d7; --base:#cdc7b9; --screen:#b8c9ad; --red:#bd503b; --green:#466d5b; --yellow:#d5a940; color:var(--ink); background:#d0cabe; border:1px solid #aaa496; border-radius:18px; box-shadow:0 3px 0 #f6f0e3 inset; }
+    .d-top { height:55px; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; padding:0 20px; border-bottom:1px solid #aaa496; background:#ded8cb; }
+    .d-brand { display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700}.d-mark{display:grid;grid-template-columns:repeat(3,5px);align-items:end;justify-content:center;gap:3px;width:32px;height:32px;padding:7px;background:var(--ink);border-radius:8px;box-shadow:0 3px 0 #171b19}.d-mark i:nth-child(1){height:9px;background:var(--yellow)}.d-mark i:nth-child(2){height:18px;background:var(--red)}.d-mark i:nth-child(3){height:13px;background:#9bb8a4}
+    .d-nav { display:flex; gap:4px; padding:4px; background:#c5bfb1; border:1px solid #9f998c; border-radius:9px; }.d-nav span{padding:7px 12px;color:#656b65;font-size:9px}.d-nav b{padding:7px 12px;color:#f2eee3;background:var(--ink);border-radius:6px;font-size:9px}
+    .d-online { justify-self:end;display:flex;align-items:center;gap:7px;font-size:8px}.d-online i{width:8px;height:8px;border-radius:50%;background:#72a477;border:2px solid #285442}
+    .d-main { height:282px; display:grid; grid-template-columns:.93fr 1.07fr; gap:22px; padding:26px 30px 20px; }
+    .d-copy { align-self:center; }.d-kicker{display:inline-flex;gap:9px;align-items:center;padding:5px 8px;background:#d5cfc2;border:1px solid #a49e90;border-radius:6px;font-size:8px}.d-kicker b{padding:3px 6px;color:#eee9dc;background:var(--red);font:700 8px ui-monospace,monospace;border-radius:3px}
+    .d-copy h3 { margin:17px 0 11px;font-size:39px;line-height:1.05;font-weight:650}.d-copy h3 em{color:var(--red)}.d-copy p{width:27em;max-width:100%;margin:0;color:#626963;font-size:10px;line-height:1.7}
+    .d-modes { display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:15px;padding:5px;background:#cbc5b7;border:1px solid #a39d90;border-radius:9px}.d-modes span{padding:7px 5px;text-align:center;background:#e3ded2;border:1px solid #aaa396;border-radius:6px;font-size:8px}.d-modes b{padding:7px 5px;text-align:center;color:#f2eee3;background:var(--red);border:1px solid #6f3228;border-radius:6px;box-shadow:0 2px 0 #73372c;font-size:8px}
+    .d-start { display:inline-flex;align-items:center;gap:7px;margin-top:13px;padding:9px 12px;color:#f5f1e6;background:#29342f;border-radius:7px;box-shadow:0 3px 0 #111814;font-size:9px}.d-start i{width:8px;height:8px;border-radius:50%;background:#df6751;border:2px solid #813e31}
+    .d-console { position:relative; width:326px;height:254px;justify-self:end;padding:17px 18px;background:#c5bfb1;border:1px solid #8f897d;border-radius:23px 23px 34px 23px;box-shadow:0 7px 0 #928c80,0 12px 20px rgba(45,43,38,.22),0 2px 0 #f6f0e3 inset;transform:rotate(.6deg)}
+    .d-screw{position:absolute;width:7px;height:7px;border-radius:50%;background:#a19b8f;border:1px solid #777168}.d-screw.s1{left:9px;top:9px}.d-screw.s2{right:9px;top:9px}.d-screw.s3{right:11px;bottom:10px}
+    .d-label { display:flex;justify-content:space-between;margin:0 4px 7px;font:700 7px ui-monospace,monospace;letter-spacing:.08em}.d-label small{color:#706c64;font-size:6px}
+    .d-bezel { padding:10px 13px 12px;background:#49504c;border:2px solid #313633;border-radius:16px 16px 22px 16px;box-shadow:0 4px 8px rgba(17,22,19,.4) inset}.d-screen{height:123px;color:#173025;background:var(--screen);border:3px solid #26342e;border-radius:6px;box-shadow:0 3px 7px rgba(15,20,17,.4) inset}.d-screen-head{display:flex;justify-content:space-between;padding:7px 8px;border-bottom:1px solid rgba(28,52,41,.35);font:700 7px ui-monospace,monospace}.d-game-road{position:relative;height:88px;overflow:hidden}.d-game-road:before,.d-game-road:after{content:"";position:absolute;top:-5px;bottom:0;width:2px;background:#294435}.d-game-road:before{left:29%;transform:skewX(-12deg)}.d-game-road:after{right:29%;transform:skewX(12deg)}.d-player{position:absolute;left:calc(50% - 15px);bottom:9px;width:30px;height:44px;border:3px solid #284334;border-radius:6px}.d-rival{position:absolute;left:36%;top:14px;width:17px;height:25px;border:2px solid #284334}
+    .d-controls { display:grid;grid-template-columns:72px 1fr 88px;align-items:center;padding:14px 4px 0}.d-dpad{width:54px;height:54px;background:linear-gradient(#2d3631 0 0) center/19px 54px no-repeat,linear-gradient(#2d3631 0 0) center/54px 19px no-repeat;filter:drop-shadow(0 3px 0 #111714)}.d-speaker{display:grid;grid-template-columns:repeat(4,4px);justify-content:center;gap:5px;transform:rotate(-8deg)}.d-speaker i{width:4px;height:12px;border-radius:4px;background:#8d877c}.d-ab{display:flex;gap:11px;transform:rotate(-10deg)}.d-ab i{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;color:#f4e8db;background:var(--red);box-shadow:0 4px 0 #73372c;font:700 8px ui-monospace,monospace}
+    .d-rack { height:93px;padding:11px 14px 13px;background:#ddd8cc;border-top:1px solid #aaa496}.d-rack-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.d-rack-head b{font-size:12px}.d-rack-head span{color:#6d736e;font:700 7px ui-monospace,monospace}.d-carts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.d-cart{display:grid;grid-template-columns:24px 1fr auto;gap:8px;align-items:center;padding:7px 8px;background:#b7b1a5;border:1px solid #79766e;border-radius:6px;box-shadow:0 3px 0 #858077}.d-cart strong{display:grid;place-items:center;width:22px;height:22px;color:#f2eadd;background:var(--red);font:700 8px ui-monospace,monospace}.d-cart.green strong{background:var(--green)}.d-cart.yellow strong{color:#252b28;background:var(--yellow)}.d-cart span{font-size:8px;font-weight:700}.d-cart small{color:#6b6f69;font-size:7px}.d-cart em{font:700 9px ui-monospace,monospace}
+
+    @media (max-width: 980px) {
+      .preview-grid { grid-template-columns: 1fr; max-width: 760px; }
+      .notes-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 620px) {
+      .preview-head { grid-template-columns: 1fr; padding: 24px 16px 16px; }
+      .preview-grid { gap: 18px; padding: 18px 14px; }
+      .viewport { height: 310px; }
+      .stage { transform: translate(-50%, -50%) scale(.62); }
+      .direction-meta { grid-template-columns: 1fr; padding: 16px; }
+      .direction-meta .qmdp-pick-button { width: 100%; }
+      .notes { margin: 0 14px 28px; }
+      .notes-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="preview-head">
+    <div>
+      <small>TIME MACHINE / UI REBUILD · 方向选择</small>
+      <h1>先选一套能真正上线的视觉语言。</h1>
+    </div>
+    <p>玩法逻辑保持不动，这里只比较首页、游戏收藏、模式入口与局内 HUD 的设计气质。推荐方向 A：它最能保留现在的温暖怀旧感，同时把“平台底座”做成独有资产。</p>
+  </header>
+
+  <section id="design-dials" class="qmdp-dials" data-qmdp-dials aria-label="设计拨盘">
+    <label class="qmdp-dial"><span class="qmdp-dial-head"><span>视觉冒险度</span><output data-qmdp-output="variance">8</output></span><input data-qmdp-dial="variance" type="range" min="1" max="10" value="8"></label>
+    <label class="qmdp-dial"><span class="qmdp-dial-head"><span>动效强度</span><output data-qmdp-output="motion">7</output></span><input data-qmdp-dial="motion" type="range" min="1" max="10" value="7"></label>
+    <label class="qmdp-dial"><span class="qmdp-dial-head"><span>信息密度</span><output data-qmdp-output="density">7</output></span><input data-qmdp-dial="density" type="range" min="1" max="10" value="7"></label>
+  </section>
+
+  <main class="preview-grid">
+    <article class="direction" data-design-option="A" data-name="时光机博物馆">
+      <div class="viewport">
+        <section class="stage a-stage" aria-label="方向 A 样机">
+          <header class="a-top"><div class="a-brand"><span class="a-mark">TM</span><span>游戏时光机</span></div><nav class="a-nav"><b>游戏收藏</b><span>每日挑战</span><span>时光档案</span></nav><div class="a-open"><i></i> ARCHIVE OPEN · 08:42</div></header>
+          <div class="a-main">
+            <section class="a-copy"><div class="a-index"><span>藏品 04</span>DAILY SEED / 0715—B</div><h3>把今天，<br><em>玩成纪录。</em></h3><p>每一台游戏都有编号、规则与维护记录。相同种子开局，让操作成为唯一变量。</p><div class="a-action"><b>开始炼狱挑战 →</b><span>180 SEC · ZERO MERCY</span></div><div class="a-plate">馆藏编号 TM–04 / 可运行</div></section>
+            <div class="a-machine-wrap"><div class="a-shadow"></div><div class="a-machine"><i class="a-screw one"></i><i class="a-screw two"></i><i class="a-screw three"></i><div class="a-label"><span>TIME MACHINE / 04</span><small>FIELD TEST UNIT</small></div><div class="a-screen"><div class="a-screen-head"><span>时光方块 · 炼狱</span><strong>01:17</strong></div><div class="a-playfield"><i class="a-block b1"></i><i class="a-block b2"></i><i class="a-block b3"></i><i class="a-block b4"></i><i class="a-block b5"></i><i class="a-block b6"></i><i class="a-block b7"></i></div></div><div class="a-controls"><div class="a-dpad"></div><div class="a-speaker"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="a-buttons"><i>B</i><i>A</i></div></div></div></div>
+          </div>
+          <div class="a-rack"><div class="a-rack-title"><small>GAME ARCHIVE</small><strong>今夜馆藏</strong></div><div class="a-game active"><span>01 · 正在游玩</span><b>时光方块：竞技场</b><em>→</em></div><div class="a-game"><span>04 · 零失误</span><b>时光赛车</b><em>04</em></div><div class="a-game"><span>07 · 禁航区</span><b>时光战机</b><em>07</em></div></div>
+        </section>
+      </div>
+      <div class="direction-meta"><div><div class="direction-title"><b>A</b><h2>时光机博物馆</h2><span class="recommended">推荐</span></div><p>工业编辑陈列 + 实体藏品。游戏像编号设备，局内 HUD 像仪器面板；最适合沉淀整个平台的独有资产。</p></div><button class="qmdp-pick-button" type="button">选择 A · 时光机博物馆</button></div>
+    </article>
+
+    <article class="direction" data-design-option="B" data-name="深夜街机厅">
+      <div class="viewport">
+        <section class="stage b-stage" aria-label="方向 B 样机">
+          <header class="b-top"><div class="b-brand"><span class="b-mark">GT</span>游戏时光机</div><nav class="b-nav"><b>游戏厅</b><span>排行榜</span><span>时光档案</span></nav><div class="b-live"><i></i>今夜营业中</div></header>
+          <div class="b-main"><section class="b-copy"><div class="b-kicker"><span>本周挑战</span>WEEK 29 / NO.04</div><h3>把最后一枚<br>代币押给自己。</h3><p>八台时光机，只有一份当日纪录。固定种子、零失误规则，每次失败都有据可查。</p><div class="b-actions"><b>投入代币 →</b><span>查看今夜榜单</span></div><div class="b-stats"><div><small>在线挑战者</small><strong>284</strong></div><div><small>今日最佳</small><strong>02:47.36</strong></div><div><small>你的连胜</small><strong>06</strong></div></div></section><div class="b-cabinet-area"><div class="b-cabinet"><div class="b-marquee"><span>TIME RACER / 04</span><b>零失误</b></div><div class="b-screen"><div class="b-screen-head"><span>STAGE 03</span><b>00:38</b></div><div class="b-road"><i class="b-line"></i></div><span class="b-rival">88</span><span class="b-car">04</span><span class="b-warning">路肩收窄</span></div><div class="b-controls"><i class="b-stick"></i><i class="b-key">A</i><i class="b-key">B</i><small>ONE TOKEN · ONE RUN</small></div></div></div></div>
+          <div class="b-shelf"><div class="b-shelf-title"><small>ARCADE SHELF</small><b>今夜开放</b></div><article class="b-game dark"><span>01 · 正在游玩</span><h4>时光方块：竞技场</h4><p>撑过最后 30 秒才算开始。</p><b>继续 →</b></article><article class="b-game green"><span>07 · 弹幕封锁</span><h4>时光战机：禁航区</h4><p>控温、擦弹、穿过核心。</p><b>起飞 →</b></article></div>
+        </section>
+      </div>
+      <div class="direction-meta"><div><div class="direction-title"><b>B</b><h2>深夜街机厅</h2></div><p>煤黑、旧胶片米色与黄铜按钮。首页像仍在营业的实体机厅，失败记录像机器吐出的纸带证据。</p></div><button class="qmdp-pick-button" type="button">选择 B · 深夜街机厅</button></div>
+    </article>
+
+    <article class="direction" data-design-option="C" data-name="频道 180">
+      <div class="viewport">
+        <section class="stage c-stage" aria-label="方向 C 样机">
+          <header class="c-top"><div class="c-brand"><b>TGM</b><span>时光竞技转播</span></div><div class="c-ticker"><em>正在播出</em><b>今晚挑战赛</b><small>CH · 04</small></div><time class="c-clock">20:46:18</time></header>
+          <div class="c-main"><section class="c-copy"><div class="c-eyebrow">PLAYBACK SPORTS 86 <b>赛季 02</b></div><h3>把今晚<br>打成纪录。</h3><p>11 台时光机，每一局都由同一颗种子发牌。失误会被记住，翻盘也会。</p><div class="c-action"><b>进入今日赛</b><span>赛道编号 0715—B</span></div><div class="c-lower"><b>今日焦点</b><span>时光赛车 · 零失误</span></div></section><div class="c-live"><div class="c-live-head"><b>直播</b><span>04 号机位 · 最终弯</span><span>REC ●</span></div><i class="c-sun"></i><i class="c-mountain"></i><div class="c-road"><i></i></div><div class="c-car">04</div><div class="c-data"><div><small>速度</small><strong>286</strong></div><div><small>热量</small><strong>78%</strong></div><div><small>名次</small><strong>03</strong></div></div></div></div>
+          <div class="c-schedule"><div class="c-schedule-head"><span>节目单 / GAME ARCHIVE</span><b>今晚可挑战 · 01—11</b></div><div class="c-programs"><article class="c-program"><small>01 · 正在热播</small><b>时光方块：竞技场</b></article><article class="c-program red"><small>04 · 焦点赛事</small><b>时光赛车</b></article><article class="c-program cream"><small>07 · 晚间首播</small><b>时光战机：禁航区</b></article></div></div>
+        </section>
+      </div>
+      <div class="direction-meta"><div><div class="direction-title"><b>C</b><h2>频道 180</h2></div><p>80 年代电视赛事图形系统：直播标、字幕条与场记编号贯穿首页和 HUD，竞技氛围最强。</p></div><button class="qmdp-pick-button" type="button">选择 C · 频道 180</button></div>
+    </article>
+
+    <article class="direction" data-design-option="D" data-name="精密玩具实验室">
+      <div class="viewport">
+        <section class="stage d-stage" aria-label="方向 D 样机">
+          <header class="d-top"><div class="d-brand"><span class="d-mark"><i></i><i></i><i></i></span>游戏时光机</div><nav class="d-nav"><b>游戏库</b><span>每日挑战</span><span>时光档案</span></nav><div class="d-online"><i></i><b>ONLINE · 08:42</b></div></header>
+          <div class="d-main"><section class="d-copy"><div class="d-kicker"><span>今日推荐</span><b>07 / 15</b></div><h3>把今天，<br><em>玩得更难一点。</em></h3><p>每天一组固定规则。失败会留下记录，重来不会降低难度。</p><div class="d-modes"><b>炼狱 · 180</b><span>无尽 · 纪录</span><span>影子 · 好友</span></div><div class="d-start"><i></i>开始今日挑战 →</div></section><div class="d-console"><i class="d-screw s1"></i><i class="d-screw s2"></i><i class="d-screw s3"></i><div class="d-label"><span>TIME MACHINE</span><small>PORTABLE CHALLENGE SYSTEM</small></div><div class="d-bezel"><div class="d-screen"><div class="d-screen-head"><span>时光赛车 / 炼狱</span><b>01:42</b></div><div class="d-game-road"><i class="d-rival"></i><i class="d-player"></i></div></div></div><div class="d-controls"><div class="d-dpad"></div><div class="d-speaker"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="d-ab"><i>B</i><i>A</i></div></div></div></div>
+          <div class="d-rack"><div class="d-rack-head"><b>卡带收藏 / GAME LIBRARY</b><span>11 TITLES · READY</span></div><div class="d-carts"><div class="d-cart"><strong>04</strong><span>时光赛车</span><em>→</em></div><div class="d-cart green"><strong>07</strong><span>时光战机</span><em>→</em></div><div class="d-cart yellow"><strong>09</strong><span>时光列车</span><em>→</em></div></div></div>
+        </section>
+      </div>
+      <div class="direction-meta"><div><div class="direction-title"><b>D</b><h2>精密玩具实验室</h2></div><p>暖灰塑料、螺丝、按键行程与卡带收藏。像 Braun 仪器和 Nintendo 掌机共同设计的挑战终端。</p></div><button class="qmdp-pick-button" type="button">选择 D · 精密玩具实验室</button></div>
+    </article>
+  </main>
+
+  <section class="notes">
+    <p>四套方案都不是单页换肤，而是可扩展到：首页、游戏收藏、三种挑战模式、排行榜、时光档案与全部局内 HUD。选中后，我会按该方向重构真实页面并逐个游戏做视觉适配。</p>
+    <div class="notes-grid"><div><b>A · 记忆点</b><span>编号铭牌、馆藏档案、实体设备。最能形成平台自己的品牌资产。</span></div><div><b>B · 记忆点</b><span>代币、黄铜按钮、深夜营业灯与纸带纪录，沉浸感最强。</span></div><div><b>C · 记忆点</b><span>直播标、字幕条、场记编号，把每一局包装成电视赛事。</span></div><div><b>D · 记忆点</b><span>卡带、旋钮、螺丝与按钮行程，触感与亲和力最强。</span></div></div>
+  </section>
+</body>
+</html>

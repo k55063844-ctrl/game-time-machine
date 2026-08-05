@@ -1,0 +1,14 @@
+{
+  "id": "C",
+  "label": "C: 口袋掌机",
+  "name": "口袋掌机",
+  "notes": "",
+  "dials": {
+    "variance": 7,
+    "motion": 5,
+    "density": 6
+  },
+  "adjustments": "",
+  "source": "click",
+  "receivedAt": "2026-07-14T15:36:09.334Z"
+}

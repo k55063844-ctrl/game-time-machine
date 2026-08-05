@@ -1,0 +1,14 @@
+{
+  "id": "D",
+  "label": "D: 精密玩具实验室",
+  "name": "精密玩具实验室",
+  "notes": "",
+  "dials": {
+    "variance": 9,
+    "motion": 9,
+    "density": 6
+  },
+  "adjustments": "",
+  "source": "click",
+  "receivedAt": "2026-07-15T14:32:09.521Z"
+}

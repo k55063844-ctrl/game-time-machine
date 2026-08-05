@@ -1,0 +1,1 @@
+{"name":"game-time-machine","private":true,"version":"0.1.0","type":"module","scripts":{"dev":"vite --host 127.0.0.1","build":"vite build","test:score":"node scripts/test-score-store.mjs","test:games":"node scripts/test-expansion-games.mjs","test":"npm run test:score && npm run test:games && npm run build"},"devDependencies":{"vite":"^7.0.0"}}
