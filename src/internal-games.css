@@ -594,6 +594,68 @@ body[data-page$="game"]:before{
 .racer-game .cell-truck,
 .racer-game .cell-ghost,
 .racer-game .arcade-player{border-radius:3px 3px 1px 1px!important}
+/* Racer art is presentation only: the player grows upward from its cell and
+   traffic remains centered. Each load group keeps its original CSS fallback. */
+.racer-game #arcade-board.has-racer-fleet :is(.cell-car,.cell-truck,.cell-ghost):not(.arcade-player){
+  --racer-traffic-sprite:url('/assets/zhanzhan-racer-traffic-gold.png');
+  background:transparent!important;
+  box-shadow:none!important;
+  border:0;
+  border-radius:0!important;
+  transform:none;
+  z-index:4;
+}
+/* Ten cells per row: column-based paint never changes as traffic moves down. */
+.racer-game #arcade-board.has-racer-fleet :is(.cell-car,.cell-truck,.cell-ghost):not(.arcade-player):is(:nth-child(10n+2),:nth-child(10n+5),:nth-child(10n+8)){
+  --racer-traffic-sprite:url('/assets/zhanzhan-racer-traffic-blue.png');
+}
+.racer-game #arcade-board.has-racer-fleet :is(.cell-car,.cell-truck,.cell-ghost):not(.arcade-player):is(:nth-child(10n+3),:nth-child(10n+6),:nth-child(10n+9)){
+  --racer-traffic-sprite:url('/assets/zhanzhan-racer-traffic-green.png');
+}
+.racer-game #arcade-board.has-racer-fleet :is(.cell-car,.cell-truck,.cell-ghost):not(.arcade-player)::before{
+  content:"";
+  position:absolute;
+  inset:auto;
+  left:50%;
+  top:50%;
+  width:150%;
+  height:auto;
+  aspect-ratio:2/3;
+  transform:translate(-50%,-50%);
+  border:0;
+  border-radius:0;
+  background:var(--racer-traffic-sprite) center/contain no-repeat;
+  box-shadow:none;
+  pointer-events:none;
+  filter:drop-shadow(0 3px 2px rgba(18,25,24,.35));
+}
+.racer-game #arcade-board.has-racer-fleet .cell-truck:not(.arcade-player)::before{width:160%}
+.racer-game #arcade-board.has-racer-fleet :is(.cell-car,.cell-truck,.cell-ghost):not(.arcade-player)::after{content:none}
+.racer-game #arcade-board.has-racer-art .arcade-player{
+  background:transparent!important;
+  box-shadow:none!important;
+  border:0;
+  transform:none;
+  z-index:6;
+}
+.racer-game #arcade-board.has-racer-art .arcade-player::before{
+  content:"";
+  position:absolute;
+  inset:auto;
+  left:50%;
+  bottom:0;
+  width:180%;
+  height:auto;
+  aspect-ratio:2/3;
+  transform:translateX(-50%);
+  border:0;
+  border-radius:0;
+  background:url('/assets/zhanzhan-racer-player-rear.png') center bottom/contain no-repeat;
+  box-shadow:none;
+  pointer-events:none;
+  filter:drop-shadow(0 3px 2px rgba(18,25,24,.35));
+}
+.racer-game #arcade-board.has-racer-art .arcade-player::after{content:none}
 .crossing-game .arcade-board{
   border-color:#172320;
   background:#6e8a82;
@@ -897,3 +959,4 @@ body[data-page$="game"]:before{
   .run-result,.result-panel{transition-duration:.01ms}
   .pressure-track em,.resource-gauge em{transition-duration:.01ms}
 }
+.wave-theme-submarine .machine-screen .submarine-character{display:block;width:94%;height:auto;max-height:100%;object-fit:contain;position:relative;z-index:1;filter:drop-shadow(0 8px 12px rgba(8,23,27,.28))}

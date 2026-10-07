@@ -1,0 +1,39 @@
+{
+  "generator": "built-in image_gen",
+  "created": "2026-10-07",
+  "references": [
+    "zhanzhan-racer.png",
+    "lgd-logo.png"
+  ],
+  "assets": [
+    {
+      "file": "zhanzhan-racer-player-rear.png",
+      "width": 1024,
+      "height": 1536,
+      "transparentBackground": true,
+      "prompt": "Use case: precise-object-edit. Asset type: transparent player car sprite for an overhead road-racing game. Image 1 is the existing red Zhanzhan racing car to preserve; image 2 is its exact LGD badge reference. Correct the viewpoint and vehicle direction: render this SAME red-and-cream open-cockpit racing kart from HIGH ABOVE AND BEHIND, 70-degree overhead REAR view. The front nose and front headlights MUST point toward the TOP of the image (north); rear wing, rear bumper and two red tail lights MUST be at the BOTTOM. We are following the car driving AWAY from the viewer, never towards the viewer. Do not merely rotate the current picture upside down: reconstruct the correct rear/top view of the same car. Zhanzhan remains seated, facing forward/up the track, both white-gloved hands on steering wheel ahead of him; we see his red head from behind, the recognisable three black horns/crest and side ears, a glimpse of white cheeks only if natural, red shoulders. Do not turn his face backwards. Retain the exact car body model, fenders, four black tires, cream stripe, polished red lacquer, compact toy proportions and elegant graphite/silver trim. Small round LGD crest on cream rear wing/deck, oriented naturally on the car, plus front hood badge if visible. Full vehicle entirely inside canvas, vertically aligned and centered with same approximate 2:3 portrait framing as reference, no diagonal yaw. Polished 2.5D game sprite with clear readable silhouette when small. No extra elements. GENUINE RGBA transparent background, no black backdrop, no scenery, no ground, no haze, no glow aura, no floor shadow, no text outside badges, no watermark. Clean antialiased silhouette with 5 percent transparent margin."
+    },
+    {
+      "file": "zhanzhan-racer-traffic-gold.png",
+      "width": 1024,
+      "height": 1536,
+      "transparentBackground": true,
+      "prompt": "Use case: precise-object-edit. Asset type: transparent oncoming racing car sprite, recolor variant of the provided game asset. Image 1 is the edit target; image 2 is exact logo reference. CHANGE ONLY THE CAR BODY PAINT from red to warm golden yellow: hood side panels, fenders, wing and colored chassis panels. KEEP the cream center stripe, metallic trim, black tires, dark cockpit, headlights and exact blue/red LGD badges unchanged. CRITICAL: the Zhanzhan dragon DRIVER MUST STAY RED, including head, cheeks, body and arms; preserve black horns, amber eyes, white muzzle/gloves/belly, facial expression, pose, both hands gripping steering wheel and exact mascot identity. Do not hue-shift the whole image. Keep identical car geometry, front-high-angle overhead camera, portrait framing, position, scale, all four tires and the whole vehicle. Front pointed nose/headlights at BOTTOM, wing at TOP, exact same orientation as reference. ONE vehicle only, no labels. Preserve a genuinely transparent RGBA alpha background and clean edges, remove any residual haze/glow/shadow outside solid silhouette. No black backdrop, floor, scene, aura or watermark. The ONLY visual difference from the original vehicle should be its warm golden yellow body paint; the driver is the same red dragon."
+    },
+    {
+      "file": "zhanzhan-racer-traffic-blue.png",
+      "width": 1024,
+      "height": 1536,
+      "transparentBackground": true,
+      "prompt": "Use case: precise-object-edit. Asset type: transparent oncoming racing car sprite, recolor variant of the provided game asset. Image 1 is the edit target; image 2 is exact logo reference. CHANGE ONLY THE CAR BODY PAINT from red to saturated cobalt blue: hood side panels, fenders, wing and colored chassis panels. KEEP the cream center stripe, metallic trim, black tires, dark cockpit, headlights and exact blue/red LGD badges unchanged. CRITICAL: the Zhanzhan dragon DRIVER MUST STAY RED, including head, cheeks, body and arms; preserve black horns, amber eyes, white muzzle/gloves/belly, facial expression, pose, both hands gripping steering wheel and exact mascot identity. Do not hue-shift the whole image. Keep identical car geometry, front-high-angle overhead camera, portrait framing, position, scale, all four tires and the whole vehicle. Front pointed nose/headlights at BOTTOM, wing at TOP, exact same orientation as reference. ONE vehicle only, no labels. Preserve a genuinely transparent RGBA alpha background and clean edges, remove any residual haze/glow/shadow outside solid silhouette. No black backdrop, floor, scene, aura or watermark. The ONLY visual difference from the original vehicle should be its saturated cobalt blue body paint; the driver is the same red dragon."
+    },
+    {
+      "file": "zhanzhan-racer-traffic-green.png",
+      "width": 1024,
+      "height": 1536,
+      "transparentBackground": true,
+      "prompt": "Use case: precise-object-edit. Asset type: transparent oncoming racing car sprite, recolor variant of the provided game asset. Image 1 is the edit target; image 2 is exact logo reference. CHANGE ONLY THE CAR BODY PAINT from red to rich mint jade green: hood side panels, fenders, wing and colored chassis panels. KEEP the cream center stripe, metallic trim, black tires, dark cockpit, headlights and exact blue/red LGD badges unchanged. CRITICAL: the Zhanzhan dragon DRIVER MUST STAY RED, including head, cheeks, body and arms; preserve black horns, amber eyes, white muzzle/gloves/belly, facial expression, pose, both hands gripping steering wheel and exact mascot identity. Do not hue-shift the whole image. Keep identical car geometry, front-high-angle overhead camera, portrait framing, position, scale, all four tires and the whole vehicle. Front pointed nose/headlights at BOTTOM, wing at TOP, exact same orientation as reference. ONE vehicle only, no labels. Preserve a genuinely transparent RGBA alpha background and clean edges, remove any residual haze/glow/shadow outside solid silhouette. No black backdrop, floor, scene, aura or watermark. The ONLY visual difference from the original vehicle should be its rich mint jade green body paint; the driver is the same red dragon."
+    }
+  ],
+  "contract": "Player nose points up (rear view); oncoming traffic nose points down. Only vehicle paint varies; driver remains red. No changes to game physics, collision or scoring."
+}

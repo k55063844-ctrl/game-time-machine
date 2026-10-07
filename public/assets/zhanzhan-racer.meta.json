@@ -1,0 +1,17 @@
+{
+  "asset": "zhanzhan-racer.png",
+  "generator": "built-in image_gen",
+  "useCase": "stylized-concept / background-extraction",
+  "width": 1024,
+  "height": 1536,
+  "transparentBackground": true,
+  "references": [
+    "zhanzhan-platformer-lgd.png",
+    "lgd-logo.png"
+  ],
+  "prompts": [
+    "Use case: stylized-concept. Asset type: one transparent PNG player vehicle sprite for an overhead arcade road-racing game. Input image 1: exact identity and rendering style reference for Zhanzhan, the red dragon mascot with black horns, amber eyes, white muzzle, white belly and gloves. Input image 2: exact round LGD Gaming badge reference. Create one compact beautiful red open-cockpit sports racing kart with Zhanzhan visibly seated behind the steering wheel, both white-gloved hands gripping it. High angle 65-degree overhead FRONT view, centered on the longitudinal axis, not a side view. The car is aligned VERTICALLY, its front nose and two headlights pointing toward the BOTTOM of the image, matching the existing player-car art. Vehicle is about 1.5 times as tall as wide. Show the entire car, four black rubber tires, red fenders, cream-white hood/centre stripe, dark graphite lower bumper, small rear wing at TOP, two pale warm headlights at BOTTOM, and cockpit. Zhanzhan's face must be large and very readable from above: determined friendly expression, amber eyes, black pointed horns and central crest, red cheeks, white muzzle. Keep his upper white belly with the exact small round blue-red LGD badge visible above the wheel if natural. Put a clear matching circular LGD badge on the cream hood as a readable car emblem. Keep the character visually inside the cockpit, not standing on the vehicle. Polished high-end 2.5D stylized toy game render, glossy controlled red lacquer, cream panels, crisp silver highlights, black tires. Large simple silhouettes legible when reduced to 80-100px wide. No other vehicles, no driver helmet hiding the face, no side-facing isometric angle, no diagonal rotation, no speed lines, no smoke, no glow aura, no floor shadow, no track, no road, no scene, no podium, no border, no captions, no watermark. True RGBA alpha transparency around the complete vehicle. Entire vehicle fully inside canvas with 6 percent transparent margin on all sides. Produce ONE portrait-oriented image with just this one complete car and driver.",
+    "Use case: background-extraction. Edit target: the provided Zhanzhan red racing car image. Make a precise cutout, CHANGE ONLY THE BACKGROUND: remove ALL dark/black backdrop, red haze, light halo, soft outer glow, ground shadow and reflected floor lighting outside the car silhouette. Keep every pixel of the complete car and mascot intact: exact pose, centered vertical front-high-angle camera, red and cream livery, face, horns, both hands on steering wheel, both LGD badges, all four tires, wing, front bumper and headlights. The output MUST have real fully transparent alpha outside the solid silhouette, including gaps between wheel and car. No semitransparent glow around edges, no replacement color backdrop, no checkered pattern baked in, no new shadow. Clean precise antialiased edges. Do not redesign, relight, resize the subject, crop, rotate, add text or modify the car. Entire vehicle remains visible, same framing."
+  ],
+  "integration": "Player vehicle only. Original grid movement, collision, traffic and score mechanics unchanged."
+}

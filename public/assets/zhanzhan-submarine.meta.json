@@ -1,0 +1,11 @@
+{
+  "asset": "zhanzhan-submarine.png",
+  "created": "2026-10-06",
+  "tool": "built-in image_gen",
+  "transparent": true,
+  "references": [
+    "zhanzhan-platformer-lgd.png",
+    "lgd-logo.png"
+  ],
+  "prompt": "Use case: stylized-concept. Asset type: final transparent RGBA game sprite for a side-scrolling submarine game, ONE single complete vehicle with mascot pilot. Input image 1 is identity/style reference: the red dragon Zhanzhan mascot with round LGD belly badge; it is NOT a sprite sheet to reproduce. Input image 2 is exact logo reference for the belly badge. Create Zhanzhan piloting a compact beautiful toy-like yellow-brass exploration submarine, facing RIGHT in a readable side-three-quarter orthographic view. The submarine is genuinely enclosed and watertight, not an open car or boat. A large clear panoramic glass dome forms the upper half, showing Zhanzhan's large red head, black pointed horns and dark central crest, amber eyes, white muzzle, determined friendly expression, white-gloved hands holding two control levers; upper white belly and small circular blue-red LGD badge visible behind glass. Keep glass crystal clear so face is not obscured. Short rounded brass-yellow lower pressure hull with cream panel, restrained crimson trim, two small circular side portholes, small rear guarded propeller to the LEFT, two short underside skids, compact diving fins, and a small front headlamp at the RIGHT. Whole silhouette approximately 1.65 times as wide as tall, with a large readable mascot face; no long antenna. Polished high-end 2.5D game asset, soft cel shading with controlled glossy highlights and tactile painted metal, consistent with mascot reference. Simple bold silhouette and clean edges for display around 90 pixels wide. Three-quarter side camera at same height, not top view, no forced perspective. Vehicle and mascot fully in frame, centered with 7 percent transparent padding. Real alpha transparency around and inside appropriate cutouts. No ocean, no bubbles, no glow aura, no shadow on ground, no ground, no stand, no background, no UI, no captions, no extra characters, no duplicated vehicles, no watermark. Preserve the exact circular LGD mark on white belly, do not invent other logos."
+}

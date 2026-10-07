@@ -1,13 +1,15 @@
 const STORAGE_KEY='tm:v1:runs';
 const PLAYER_KEY='tm:v1:player';
 const MAX_RUNS=500;
+const MAX_ARCHIVED_RUNS=500;
 
 export const RULESET_VERSIONS={
  blocks:'blocks@2.0.0',snake:'snake@2.0.0',bricks:'bricks@2.0.0',tank:'tank@1.0.0',
  racer:'racer@2.0.0',miner:'miner@1.0.0',crossing:'crossing@2.0.0',
  plane:'plane@2.0.0',pinball:'pinball@2.0.0',train:'train@2.0.0',submarine:'submarine@2.0.0',skate:'skate@2.0.0',
  bomb:'bomb@1.0.0',elevator:'elevator@1.0.0',lighthouse:'lighthouse@1.0.0',goalie:'goalie@1.0.0',
- courier:'courier@1.0.0',stealth:'stealth@1.0.0',rhythm:'rhythm@1.0.0',weather:'weather@1.0.0'
+ courier:'courier@1.0.0',stealth:'stealth@1.0.0',rhythm:'rhythm@1.0.0',weather:'weather@1.0.0',
+ platformer:'platformer@2.0.0',nightwatch:'nightwatch@1.0.0'
 };
 
 const VALID_MODES_BY_GAME={
@@ -15,13 +17,16 @@ const VALID_MODES_BY_GAME={
  racer:new Set(['extreme','endless','shadow']),miner:new Set(['extreme','endless','shadow']),crossing:new Set(['extreme','endless','shadow']),
  plane:new Set(['extreme','endless','shadow']),pinball:new Set(['extreme','endless','shadow']),train:new Set(['extreme','endless','shadow']),submarine:new Set(['extreme','endless','shadow']),skate:new Set(['extreme','endless','shadow']),
  bomb:new Set(['extreme','endless','shadow']),elevator:new Set(['extreme','endless','shadow']),lighthouse:new Set(['extreme','endless','shadow']),goalie:new Set(['extreme','endless','shadow']),
- courier:new Set(['extreme','endless','shadow']),stealth:new Set(['extreme','endless','shadow']),rhythm:new Set(['extreme','endless','shadow']),weather:new Set(['extreme','endless','shadow'])
+ courier:new Set(['extreme','endless','shadow']),stealth:new Set(['extreme','endless','shadow']),rhythm:new Set(['extreme','endless','shadow']),weather:new Set(['extreme','endless','shadow']),
+ platformer:new Set(['extreme','endless','shadow']),nightwatch:new Set(['extreme','endless','shadow'])
 };
 const REQUIRED_METRIC={
  blocks:'linePoints',snake:'foods',bricks:'destroyed',tank:'destroyed',racer:'overtakes',miner:'ores',crossing:'crossings',
  plane:'eventScore',pinball:'eventScore',train:'eventScore',submarine:'eventScore',skate:'eventScore',
  bomb:'modulesDisarmed',elevator:'passengersDelivered',lighthouse:'rescues',goalie:'saves',
- courier:'deliveries',stealth:'roomsCleared',rhythm:'hits',weather:'districtsProtected'
+ courier:'deliveries',stealth:'roomsCleared',rhythm:'hits',weather:'districtsProtected',
+ platformer:['distance','coins','stomps','checkpoints','deaths'],
+ nightwatch:['kills','wavesCleared','towersBuilt','upgrades','baseHp']
 };
 const memory=new Map();
 const fallbackStorage={
@@ -78,6 +83,22 @@ function cleanMetrics(metrics={}){
  }).filter(([key])=>key));
 }
 
+function cleanRunMetrics(gameId,rawMetrics){
+ const metrics=cleanMetrics(rawMetrics);
+ if(gameId==='platformer'||gameId==='nightwatch'){
+  for(const key of REQUIRED_METRIC[gameId]){
+   if(!Object.hasOwn(metrics,key))continue;
+   metrics[key]=key==='distance'?Math.floor(Math.max(0,Math.min(1_000_000_000,finite(rawMetrics[key])))):integer(metrics[key],0,key==='baseHp'?5:1_000_000_000);
+  }
+ }
+ return metrics;
+}
+
+function missingMetric(gameId,metrics){
+ const required=REQUIRED_METRIC[gameId];
+ return (Array.isArray(required)?required:[required]).find(key=>key&&!Object.hasOwn(metrics,key));
+}
+
 function localDateKey(value=new Date()){
  const date=value instanceof Date?value:new Date(value);
  if(Number.isNaN(date.getTime()))return '';
@@ -95,8 +116,9 @@ function normalizeStoredRun(raw){
  if(!raw||!RULESET_VERSIONS[raw.gameId]||raw.rulesetVersion!==RULESET_VERSIONS[raw.gameId])return null;
  const gameId=raw.gameId,mode=raw.mode;
  if(!VALID_MODES_BY_GAME[gameId]?.has(mode))return null;
- const required=REQUIRED_METRIC[gameId],metrics=cleanMetrics(raw.metrics);
- if(required&&!Object.hasOwn(metrics,required))return null;
+ if(!raw.metrics||typeof raw.metrics!=='object'||Array.isArray(raw.metrics))return null;
+ const metrics=cleanRunMetrics(gameId,raw.metrics);
+ if(missingMetric(gameId,metrics))return null;
  const durationMs=integer(raw.durationMs,0,24*60*60*1000),outcome=['clear','failed','aborted'].includes(raw.outcome)?raw.outcome:'failed';
  const finished=new Date(raw.finishedAt),finishedMs=Number.isFinite(finished.getTime())?finished.getTime():Date.now(),finishedAt=new Date(finishedMs).toISOString();
  return {
@@ -109,12 +131,42 @@ function normalizeStoredRun(raw){
  };
 }
 
+// Old rulesets are kept for a future history/export view, never promoted into
+// current leaderboards or recalculated using rules they were not played under.
+function normalizeArchivedRun(raw){
+ if(!raw||!Object.hasOwn(RULESET_VERSIONS,raw.gameId)||raw.rulesetVersion===RULESET_VERSIONS[raw.gameId])return null;
+ const gameId=raw.gameId,rulesetVersion=String(raw.rulesetVersion||'');
+ if(!new RegExp(`^${gameId}@[0-9]+\\.[0-9]+\\.[0-9]+$`).test(rulesetVersion)||rulesetVersion.length>80)return null;
+ const runId=cleanToken(raw.runId,100),mode=cleanToken(raw.mode,40),finishedMs=new Date(raw.finishedAt).getTime();
+ if(!runId||!mode||!Number.isFinite(finishedMs)||!raw.metrics||typeof raw.metrics!=='object'||Array.isArray(raw.metrics))return null;
+ const durationMs=integer(raw.durationMs,0,24*60*60*1000);
+ return {
+  schemaVersion:1,runId,playerId:cleanToken(raw.playerId,100)||'local',gameId,mode,
+  challengeId:cleanToken(raw.challengeId,80),seed:cleanToken(raw.seed,32),rulesetVersion,scoreVersion:integer(raw.scoreVersion,1,100),
+  outcome:['clear','failed','aborted'].includes(raw.outcome)?raw.outcome:'failed',endedReason:cleanToken(raw.endedReason,40)||'unknown',
+  durationMs,metrics:cleanMetrics(raw.metrics),score:integer(raw.score),
+  startedAt:new Date(finishedMs-durationMs).toISOString(),finishedAt:new Date(finishedMs).toISOString(),inputLogHash:null,
+  verification:{status:'historical-unverified'}
+ };
+}
+
+function archiveRuns(runs){
+ const normalized=runs.map(raw=>safelyNormalizeRun(raw,normalizeArchivedRun)).filter(Boolean);
+ const unique=[...new Map(normalized.map(run=>[`${run.gameId}|${run.rulesetVersion}|${run.runId}`,run])).values()];
+ return unique.sort((a,b)=>new Date(b.finishedAt)-new Date(a.finishedAt)).slice(0,MAX_ARCHIVED_RUNS);
+}
+
+function safelyNormalizeRun(raw,normalize){try{return normalize(raw)}catch{return null}}
+
 function loadEnvelope(){
  try{
   const parsed=JSON.parse(storage().getItem(STORAGE_KEY)||'null');
-  if(parsed?.schemaVersion===1&&Array.isArray(parsed.runs))return {schemaVersion:1,runs:parsed.runs.slice(0,5000).map(normalizeStoredRun).filter(Boolean)};
+  if(parsed?.schemaVersion===1&&Array.isArray(parsed.runs)){
+   const storedRuns=parsed.runs.slice(0,5000),storedArchive=Array.isArray(parsed.archivedRuns)?parsed.archivedRuns.slice(0,5000):[];
+   return {schemaVersion:1,runs:storedRuns.map(raw=>safelyNormalizeRun(raw,normalizeStoredRun)).filter(Boolean),archivedRuns:archiveRuns([...storedArchive,...storedRuns])};
+  }
  }catch{}
- return {schemaVersion:1,runs:[]};
+ return {schemaVersion:1,runs:[],archivedRuns:[]};
 }
 
 function saveEnvelope(envelope){
@@ -166,6 +218,8 @@ export function calculateRunScore({gameId,mode='extreme',outcome='failed',durati
   case 'stealth':return integer(integer(metrics.roomsCleared)*1000+integer(metrics.silentRooms)*350-integer(metrics.alarms)*500+seconds*10+clearBonus);
   case 'rhythm':return integer(integer(metrics.hits)*60+integer(metrics.perfectHits)*80+integer(metrics.maxCombo)*20-integer(metrics.misses)*40+seconds*5+clearBonus);
   case 'weather':return integer(integer(metrics.districtsProtected)*900+integer(metrics.crisesResolved)*300+integer(metrics.systemIntegrity)*10+seconds*10+clearBonus);
+  case 'platformer':return integer(Math.floor(Math.max(0,finite(metrics.distance))/10)+integer(metrics.coins)*100+integer(metrics.stomps)*150+integer(metrics.checkpoints)*500-integer(metrics.deaths)*200+(cleared&&mode!=='endless'?3000+Math.max(0,180-seconds)*10:0));
+  case 'nightwatch':return integer(integer(metrics.kills)*100+integer(metrics.wavesCleared)*500+(cleared?3000+integer(metrics.baseHp,0,5)*200:0));
   default:return eventScore+seconds*10+clearBonus;
  }
 }
@@ -191,9 +245,9 @@ export function recordRun(input){
  if(!VALID_MODES_BY_GAME[gameId]?.has(mode))throw new Error(`Invalid mode for ${gameId}: ${mode}`);
  const outcome=['clear','failed','aborted'].includes(input.outcome)?input.outcome:'failed';
  const durationMs=integer(input.durationMs,0,24*60*60*1000);
- const metrics=cleanMetrics(input.metrics);
- const required=REQUIRED_METRIC[gameId];
- if(required&&!Object.hasOwn(metrics,required))throw new Error(`Missing metric for ${gameId}: ${required}`);
+ const metrics=cleanRunMetrics(gameId,input.metrics);
+ const missing=missingMetric(gameId,metrics);
+ if(missing)throw new Error(`Missing metric for ${gameId}: ${missing}`);
  const finishedAt=input.finishedAt&&Number.isFinite(new Date(input.finishedAt).getTime())?new Date(input.finishedAt).toISOString():new Date().toISOString();
  const challenge=currentChallenge(new Date(finishedAt));
  const startedAt=input.startedAt&&Number.isFinite(new Date(input.startedAt).getTime())?new Date(input.startedAt).toISOString():new Date(new Date(finishedAt).getTime()-durationMs).toISOString();
@@ -228,7 +282,7 @@ export function compareRuns(a,b){
  const outcomeRank={clear:0,failed:1,aborted:2},outcomeDiff=(outcomeRank[a.outcome]??2)-(outcomeRank[b.outcome]??2);
  if(outcomeDiff)return outcomeDiff;
  const aClear=a.outcome==='clear',bClear=b.outcome==='clear';
- const timedClear=['crossing','miner'].includes(a.gameId)||(a.gameId==='bricks'&&a.mode==='classic');
+ const timedClear=['crossing','miner'].includes(a.gameId)||(a.gameId==='bricks'&&a.mode==='classic')||(a.gameId==='platformer'&&a.mode!=='endless');
  if(timedClear&&aClear&&bClear&&a.durationMs!==b.durationMs)return a.durationMs-b.durationMs;
  if(!aClear&&a.gameId==='crossing'){
   if(metric(a,'crossings')!==metric(b,'crossings'))return metric(b,'crossings')-metric(a,'crossings');
@@ -281,7 +335,9 @@ export const SCORE_FORMULAS={
  courier:'完成投递 × 800 + 完美路线 × 250 − 车辆损伤 × 200 + 生存奖励',
  stealth:'通过房间 × 1,000 + 无警报房间 × 350 − 警报 × 500 + 生存奖励',
  rhythm:'有效命中 × 60 + 完美命中 × 80 + 最高连击 × 20 − 漏拍 × 40',
- weather:'保护城区 × 900 + 化解危机 × 300 + 系统完整度奖励 + 生存奖励'
+ weather:'保护城区 × 900 + 化解危机 × 300 + 系统完整度奖励 + 生存奖励',
+ platformer:'最远距离每 10 像素计 1 分（取整）+ 齿轮 × 100 + 踩敌 × 150 + 检查点 × 500 − 失误 × 200；闯关通关 +3,000，180 秒内每提前 1 秒 +10；最低 0 分',
+ nightwatch:'击败僵尸 × 100 + 完成波次 × 500；通关 +3,000，剩余基地耐久 × 200（仅通关）；建造、升级和等待不计分'
 };
 
 export function clearLocalRuns(){storage().removeItem(STORAGE_KEY)}

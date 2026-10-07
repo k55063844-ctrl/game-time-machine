@@ -9,3 +9,6 @@ mobile.png
 snake.png
 bricks.png
 *.log
+
+# Local browser verification screenshots
+artifacts/
