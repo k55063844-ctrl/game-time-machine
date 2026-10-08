@@ -665,6 +665,33 @@ body[data-page$="game"]:before{
 .crossing-game .cell-median,.crossing-game .cell-safe{background:#91ad65!important;box-shadow:inset 0 2px rgba(255,255,255,.08)}
 .crossing-game .cell-car,.crossing-game .cell-truck{border-radius:2px!important}
 .crossing-game .arcade-player{border-radius:44% 44% 35% 35%!important;box-shadow:inset 0 0 0 2px #263c31,0 0 7px rgba(230,239,90,.3)}
+/* A compact four-facing sprite replaces the marker, not its logical cell. */
+.crossing-game #arcade-board.has-crossing-art .arcade-player{
+  background:#91ad65!important;
+  border-radius:1px!important;
+  box-shadow:none!important;
+  transform:none;
+  z-index:6;
+}
+.crossing-game #arcade-board.has-crossing-art .arcade-player:is(.cell-lane,.cell-car,.cell-truck,.cell-ghost){background:#3e514d!important}
+.crossing-game #arcade-board.has-crossing-art .arcade-player::before{
+  content:"";
+  position:absolute;
+  inset:-15%;
+  background-image:url('/assets/zhanzhan-crossing-sheet.png');
+  background-repeat:no-repeat;
+  background-size:200% 200%;
+  background-position:0 0;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  pointer-events:none;
+  filter:drop-shadow(0 2px 1px rgba(24,39,31,.32));
+}
+.crossing-game #arcade-board.has-crossing-art[data-crossing-facing="right"] .arcade-player::before{background-position:100% 0}
+.crossing-game #arcade-board.has-crossing-art[data-crossing-facing="down"] .arcade-player::before{background-position:0 100%}
+.crossing-game #arcade-board.has-crossing-art[data-crossing-facing="left"] .arcade-player::before{background-position:100% 100%}
+.crossing-game #arcade-board.has-crossing-art .arcade-player::after{content:none}
 .miner-game .arcade-board{background:#8b663a;background-image:radial-gradient(rgba(242,208,86,.12) 1px,transparent 1px);background-size:20px 20px}
 
 .racer-dashboard,
@@ -960,3 +987,5 @@ body[data-page$="game"]:before{
   .pressure-track em,.resource-gauge em{transition-duration:.01ms}
 }
 .wave-theme-submarine .machine-screen .submarine-character{display:block;width:94%;height:auto;max-height:100%;object-fit:contain;position:relative;z-index:1;filter:drop-shadow(0 8px 12px rgba(8,23,27,.28))}
+.wave-theme-plane .machine-screen{background:#b0c3be}
+.wave-theme-plane .machine-screen .plane-character{display:block;width:74%;height:auto;max-height:96%;object-fit:contain;position:relative;z-index:1;filter:drop-shadow(0 6px 5px rgba(38,54,49,.2))}

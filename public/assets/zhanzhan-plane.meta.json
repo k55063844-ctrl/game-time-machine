@@ -1,0 +1,34 @@
+{
+  "generator": "built-in image_gen",
+  "intent": "generate using established Zhanzhan mascot and LGD references",
+  "player": {
+    "path": "/assets/zhanzhan-plane.png",
+    "width": 1254,
+    "height": 1254,
+    "facing": "screen up / rear top camera",
+    "renderWidth": 76
+  },
+  "enemies": {
+    "path": "/assets/plane-enemy-fleet.png",
+    "width": 2172,
+    "height": 724,
+    "columns": 3,
+    "rows": 1,
+    "facing": "screen down",
+    "renderWidth": 48,
+    "liveries": [
+      "navy-silver",
+      "brass-graphite",
+      "sage-steel"
+    ]
+  },
+  "referenceImages": [
+    "/assets/zhanzhan-platformer-lgd.png",
+    "/assets/lgd-logo.png"
+  ],
+  "transparentBackground": true,
+  "prompts": {
+    "player": "Use case: stylized-concept.\nAsset type: production transparent player-aircraft sprite for a vertical-scrolling arcade shoot-em-up.\nReferences: image 1 is the exact Zhanzhan red dragon mascot identity and glossy toy style, not a sheet layout to copy. Image 2 is the exact circular LGD badge for the aircraft.\nCreate ONE isolated red and ivory compact jet aircraft flown by Zhanzhan, premium 2.5D toy illustration. Camera is high above and slightly behind (70 degrees downward), aircraft longitudinal axis strictly vertical. Nose points to TOP of image (screen NORTH), twin exhausts and tail at BOTTOM. Show actual rear/top geometry, NOT an upside-down front-view picture. Swept short wings, ivory center fuselage stripe, polished red wing panels, graphite engine nacelles, subtle metal seams, ivory/silver edges, short paired tail fins, tiny navigation lights without glow. Broad enough cockpit to clearly see the red dragon seated INSIDE and operating the controls, not standing on a plane: recognizable black horns, red head, small white cheek visible as his head glances 20 degrees to the side while body faces forward/up, white gloved hands on flight stick, compact folded wings. Preserve mascot identity, never human. Small LGD badges accurately placed on visible upper wing panels. Clear silhouette readable at 72x80px; avoid microdetail clutter. Aircraft fills 88 percent of a nearly square canvas with equal transparent margins, entire wings and tail visible, centered. Clean soft studio highlights. True RGBA transparency outside aircraft, no sky/background/floor/podium/cast shadow/checkerboard. No fire or long exhaust trails, no text except badge, no labels, no framing, no extra planes, no watermark.",
+    "enemies": "Use case: stylized-concept.\nAsset type: one production 3-column by 1-row transparent sprite atlas of opposing aircraft for a vertical-scrolling premium toy arcade game.\nCreate a wide 3:1 canvas with THREE isolated aircraft, each centered within one exactly equal SQUARE cell. All point nose straight DOWN (screen SOUTH), tails and twin exhausts toward TOP. Camera high above and slightly ahead, 70 degrees downward. Every jet uses coherent polished 2.5D industrial-toy rendering with visible volume, crisp metal edges, recessed cockpit glass, panel seams, short swept wings, dual engine housings and small paired tail fins. No pilots or characters, these are unmanned interceptors. LEFT CELL: deep navy and pale silver streamlined interceptor, golden canopy. CENTER CELL: warm brass/mustard and graphite interceptor, dark teal canopy, broad clipped wings. RIGHT CELL: desaturated sage green and dark steel interceptor, amber canopy, double-tail silhouette. Different body design details but all occupy the SAME 84 percent cell width and 82 percent cell height, compact readable silhouettes at 44x44px. Lighting and scale identical. Clearly modeled noses must face DOWN, not upwards. Restrained premium toy materials, NOT flat arrows, NOT vector icons, no red paint to confuse player team. Equal transparent padding all around every craft, completely separated, no overlap or mixing across cell borders. True RGBA transparency across whole background and gutters. No ground/shadows/glow/flames/bullets/smoke/trails/checkerboard/labels/text/emblems/grid lines. Only three crafts in a clean sprite atlas."
+  }
+}

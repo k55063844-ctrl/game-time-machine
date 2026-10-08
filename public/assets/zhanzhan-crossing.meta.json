@@ -1,0 +1,23 @@
+{
+  "generator": "built-in image_gen",
+  "intent": "generate from mascot and logo references",
+  "asset": "/assets/zhanzhan-crossing-sheet.png",
+  "size": [
+    1254,
+    1254
+  ],
+  "transparentBackground": true,
+  "referenceImages": [
+    "/assets/zhanzhan-platformer-lgd.png",
+    "/assets/lgd-logo.png"
+  ],
+  "atlas": {
+    "columns": 2,
+    "rows": 2,
+    "topLeft": "up / rear view",
+    "topRight": "right / side view",
+    "bottomLeft": "down / front view",
+    "bottomRight": "left / side view"
+  },
+  "prompt": "Use case: stylized-concept. Asset type: production 4-direction character sprite atlas for a top-down road-crossing game, transparent RGBA. Input image 1 is the exact identity/style reference of Zhanzhan the red dragon mascot, NOT a layout reference. Input image 2 is the exact LGD circular badge to preserve on his white belly whenever visible. Create a square 2x2 sheet with FOUR isolated full-body views of the SAME character in the SAME compact walking-ready stance and scale. Camera fixed high angle, 55 degrees downward, orthographic, like a polished toy in a top-down arcade game. The character turns naturally in 3D, do NOT rotate a front-facing flat image. Grid assignment must be exact: TOP-LEFT faces NORTH / screen UP, shown from behind with the back of red head and three black horns, small folded silver-red wings, red/white tail pointing down; TOP-RIGHT faces EAST / screen RIGHT, right-facing side view; BOTTOM-LEFT faces SOUTH / screen DOWN, front view with amber eyes, friendly determined expression, white muzzle and white belly featuring exact LGD round badge; BOTTOM-RIGHT faces WEST / screen LEFT, left-facing side view. Preserve black horns and crest, amber eyes, red cheeks, white muzzle and belly, white gloves, red-white sneakers, small red-and-silver back wings and red tail with white stripe. Upright on two feet, arms bent slightly ready to step, never crawling, no car/vehicle, no frog costume, no gear or weapon. Compact silhouette: wings folded close, tail short and tucked to keep character within one road grid cell; large head and face legible at 48 px. Polished premium 2.5D game illustration with controlled glossy red finish and clean outlines, consistent studio highlights on all views. Every pose occupies at most 80 percent of its own cell dimensions; each exactly centered in its equal 50%-width, 50%-height quadrant with balanced transparent margin, completely separated and no overlap. Entire horns/feet/wings/tail visible. True transparency outside ALL character silhouettes and between cells. No background, floor, podium, shadow, glow, haze, baked checkerboard, frames, dividing lines, labels, arrows, text except small badge, no watermark. ONE square sprite sheet only, four equal cells."
+}

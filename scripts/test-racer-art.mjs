@@ -15,7 +15,8 @@ const game=runInNewContext(`${main.slice(start,end)}\n({initArcade,moveArcade,ar
  document:{querySelector:selector=>nodes.get(selector)||null},
  stopLoop(){},
  finishArcade:won=>{finished.push(won);state.playing=false;},
- applyRacerArt:element=>artCalls.push(element)
+ applyRacerArt:element=>artCalls.push(element),
+ applyCrossingArt(){}
 });
 function reset(){
  state.arcadeGame='racer';game.initArcade();state.playing=true;
