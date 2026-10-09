@@ -10,15 +10,17 @@ const keyboard=source.slice(source.indexOf("window.addEventListener('keydown',e=
 
 function fixture(){
  const nodes=new Map();
+ const audioEvents=[];
  const node=selector=>{
   if(!nodes.has(selector))nodes.set(selector,{innerHTML:'',textContent:'',dataset:{},animate(){},setAttribute(name,value){this[name]=value;}});
   return nodes.get(selector);
  };
  const state={page:'game',mode:'survival',playing:true,pieceIndex:0,piece:null,board:Array.from({length:18},()=>Array(10).fill(0)),x:3,y:0,score:0,linesCleared:0};
  let keydown;
- const context={state,structuredClone,document:{querySelector:node},finishSurvival(){state.playing=false;},finishChallenge(){state.playing=false;},window:{addEventListener(type,handler){if(type==='keydown')keydown=handler;}}};
+ const blocksAudio={unlock(){},land(){audioEvents.push({kind:'land'});},clear(lines){audioEvents.push({kind:'clear',lines});}};
+ const context={state,blocksAudio,structuredClone,document:{querySelector:node},finishSurvival(){state.playing=false;},finishChallenge(){state.playing=false;},window:{addEventListener(type,handler){if(type==='keydown')keydown=handler;}}};
  runInNewContext(`${definitions}\n${gameplay}\n${keyboard}`,context);
- return {...context,node,key:properties=>keydown({key:' ',code:'Space',repeat:false,preventDefault(){},...properties})};
+ return {...context,node,audioEvents,key:properties=>keydown({key:' ',code:'Space',repeat:false,preventDefault(){},...properties})};
 }
 
 test('NEXT preview follows the actual queue through successive locks',()=>{
@@ -64,6 +66,7 @@ for(const [lines,points,bonus] of [[1,100,0],[2,400,200],[3,800,500],[4,1200,800
   assert.equal(game.state.board.flat().filter(value=>value===6).length,4-lines);
   assert.equal(game.state.lastClear.bonus,bonus);
   assert.ok(game.node('#blocks-clear').textContent.includes(String(points)));
+  assert.deepEqual(game.audioEvents,[{kind:'land'},{kind:'clear',lines}]);
  });
 }
 
@@ -92,4 +95,19 @@ test('Space remains available to activate focused result buttons after a run end
  let prevented=0;game.key({preventDefault(){prevented++;}});
  assert.equal(prevented,0,'finished-run buttons keep native Space activation');
  assert.equal(game.state.pieceIndex,1);
+});
+
+test('landing sound fires once on lock, never on movement or rotation',()=>{
+ const game=fixture();game.spawn();game.move('left');game.move('rotate');game.move('down');
+ assert.deepEqual(game.audioEvents,[]);
+ game.move('drop');
+ assert.deepEqual(game.audioEvents,[{kind:'land'}]);
+});
+
+test('Space on the sound toggle keeps its native click instead of dropping a piece',()=>{
+ const game=fixture();game.spawn();let prevented=0;
+ game.key({target:{closest:selector=>selector==='[data-blocks-sound]'?{}:null},preventDefault(){prevented++;}});
+ assert.equal(prevented,0);
+ assert.equal(game.state.pieceIndex,1);
+ assert.deepEqual(game.audioEvents,[]);
 });

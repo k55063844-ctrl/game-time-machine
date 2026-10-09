@@ -40,6 +40,29 @@
   font-size: 13px;
   text-align: center;
 }
+.blocks-feedback-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: min(1280px,100%);
+  margin: 8px auto 0;
+}
+.blocks-feedback-row .blocks-clear-feedback { flex: 1; width: auto; min-height: 0; margin: 0; }
+.blocks-sound-toggle {
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding: 7px 12px;
+  border: 1px solid #69786f;
+  border-radius: 4px;
+  background: #303d36;
+  color: #f1ecd8;
+  font-size: 12px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.blocks-sound-toggle[aria-pressed="false"] { color: #aebbb1; background: #252e29; }
+.blocks-sound-toggle:focus-visible { outline: 2px solid #f2cb4a; outline-offset: 2px; }
+.blocks-sound-toggle:disabled { cursor: default; opacity: .65; }
 .blocks-game .touch-controls button { touch-action: manipulation; }
 .blocks-game .control-deck .hard-drop {
   width: 108px;
