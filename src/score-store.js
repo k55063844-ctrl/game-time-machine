@@ -4,7 +4,7 @@ const MAX_RUNS=500;
 const MAX_ARCHIVED_RUNS=500;
 
 export const RULESET_VERSIONS={
- blocks:'blocks@2.0.0',snake:'snake@2.0.0',bricks:'bricks@2.0.0',tank:'tank@1.0.0',
+ blocks:'blocks@3.0.0',snake:'snake@2.0.0',bricks:'bricks@2.0.0',tank:'tank@1.0.0',
  racer:'racer@2.0.0',miner:'miner@1.0.0',crossing:'crossing@2.0.0',
  plane:'plane@2.0.0',pinball:'pinball@2.0.0',train:'train@2.0.0',submarine:'submarine@2.0.0',skate:'skate@2.0.0',
  bomb:'bomb@1.0.0',elevator:'elevator@1.0.0',lighthouse:'lighthouse@1.0.0',goalie:'goalie@1.0.0',
@@ -318,7 +318,7 @@ export function getGameStats({gameId,mode}={}){
 export function formatScore(value){return integer(value).toLocaleString('zh-CN')}
 
 export const SCORE_FORMULAS={
- blocks:'消行分 + 生存秒数 × 10 + 通关奖励 3,000',
+ blocks:'累计消行分（单次消除 1 / 2 / 3 / 4 行分别得 100 / 400 / 800 / 1,200 分）+ 生存秒数 × 10 + 通关奖励 3,000',
  snake:'吃到食物 × 500 + 生存秒数 × 10 + 通关奖励 3,000',
  bricks:'击碎砖块 × 100 + 生存秒数 × 10 + 通关奖励 3,000',
  racer:'成功避让车辆 × 200 + 生存秒数 × 10 + 通关奖励 3,000',

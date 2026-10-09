@@ -119,6 +119,34 @@ globalThis.localStorage={
  removeItem:key=>browserStorage.delete(key)
 };
 
+const historicBlocks={
+ schemaVersion:1,runId:'historic_blocks_v2',playerId:'local_blocks_history',gameId:'blocks',mode:'extreme',
+ challengeId:'daily:2026-10-08',seed:'1008',rulesetVersion:'blocks@2.0.0',scoreVersion:1,
+ outcome:'clear',endedReason:'target-cleared',durationMs:20_000,metrics:{linePoints:800,lines:4},score:98_765,
+ startedAt:'2026-10-08T00:00:00.000Z',finishedAt:'2026-10-08T00:00:20.000Z',inputLogHash:null,
+ persistence:'device',verification:{status:'local'}
+};
+browserStorage.set('tm:v1:runs',JSON.stringify({schemaVersion:1,runs:[historicBlocks]}));
+assert.equal(getBestRun({gameId:'blocks',mode:'extreme'}),null,'v2 blocks scores cannot enter the stronger multiline ruleset leaderboard');
+assert.equal(getGameStats({gameId:'blocks'}).attempts,0,'v2 blocks attempts cannot inflate v3 statistics');
+const currentBlocks=run({durationMs:1_000,metrics:{linePoints:1_200,lines:4}});
+assert.equal(currentBlocks.rulesetVersion,'blocks@3.0.0','new multiline scores are saved under the v3 blocks ruleset');
+assert.equal(currentBlocks.score,1_210,'new blocks scores still combine raw line points with the time bonus');
+assert.equal(getBestRun({gameId:'blocks',mode:'extreme'}).runId,currentBlocks.runId,'an old high-scoring clear cannot replace a new blocks best');
+assert.equal(getGameStats({gameId:'blocks'}).metricTotals.lines,4,'current blocks totals omit archived lines');
+let blocksEnvelope=JSON.parse(browserStorage.get('tm:v1:runs'));
+assert.equal(blocksEnvelope.runs.some(item=>item.runId===historicBlocks.runId),false,'v2 blocks history moves out of active storage when saving a v3 run');
+assert.equal(blocksEnvelope.archivedRuns.find(item=>item.runId===historicBlocks.runId).score,98_765,'v2 blocks archive preserves the original score without recalculation');
+assert.deepEqual(blocksEnvelope.archivedRuns.find(item=>item.runId===historicBlocks.runId).metrics,{linePoints:800,lines:4},'v2 blocks archive preserves its gameplay metrics');
+assert.equal(blocksEnvelope.archivedRuns.find(item=>item.runId===historicBlocks.runId).verification.status,'historical-unverified','archived blocks values remain explicitly historical');
+run({durationMs:5_000,metrics:{linePoints:400,lines:2}});
+blocksEnvelope=JSON.parse(browserStorage.get('tm:v1:runs'));
+assert.equal(blocksEnvelope.archivedRuns.length,1,'a subsequent v3 blocks save retains v2 history exactly once');
+assert.equal(blocksEnvelope.archivedRuns[0].score,98_765,'subsequent blocks saves preserve the original archived score');
+assert.equal(getGameStats({gameId:'blocks'}).attempts,2,'only v3 blocks saves enter the current attempt count');
+assert.equal(getGameStats({gameId:'blocks'}).metricTotals.lines,6,'subsequent blocks statistics continue to exclude old lines');
+clearLocalRuns();
+
 const stored=recordRun({gameId:'plane',mode:'extreme',outcome:'failed',durationMs:35_000,metrics:{eventScore:4}});
 assert.equal(stored.persistence,'device');
 const storedPlatformer=recordRun({gameId:'platformer',mode:'shadow',outcome:'clear',durationMs:90_000,metrics:platformerMetrics,score:999_999});

@@ -1,0 +1,28 @@
+services:
+  web:
+    image: game-time-machine:${GAME_RELEASE:-local}
+    build:
+      context: .
+      dockerfile: Dockerfile.nas
+      args:
+        SOURCE_REVISION: ${SOURCE_REVISION:-unknown}
+    restart: unless-stopped
+    ports:
+      - "${GAME_BIND_ADDRESS:-192.168.31.151}:${GAME_PORT:-18081}:8080"
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 128m
+    cpus: 1.0
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/healthz"]
+      interval: 15s
+      timeout: 3s
+      start_period: 5s
+      retries: 3
+    labels:
+      com.centurylinklabs.watchtower.enable: "false"
