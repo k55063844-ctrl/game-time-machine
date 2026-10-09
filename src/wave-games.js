@@ -1,5 +1,6 @@
 import {loadSubmarineArt,drawSubmarinePilot,SUBMARINE_ART_URL} from './submarine-art.js';
 import {loadPlaneArt,drawPlanePilot,drawPlaneEnemy,PLANE_PLAYER_ART_URL} from './plane-art.js';
+import {loadRoleArt,drawRoleSprite,roleArtPreview} from './role-art.js';
 
 export const waveMeta={
   plane:{no:'07',title:'时光战机',accent:'禁航区',desc:'弹幕封锁天空。短点射、控温、擦弹充能，在双 Boss 合围前击穿核心。',color:'#b94b3b',icon:'✦',stat:'击破',ui:{panel:'FLIGHT CTRL',score:'击破目标',unit:'架',resource:'武器电容',pressure:'空域封锁压力',mission:'穿越禁航弹幕，击穿拦截编队',action:'短点射',actionKey:'action',control:'四向规避 · 空格短点射',stage:'AIRSPACE V1–A',stageState:'禁航雷达已锁定',signal:'威胁方位',events:['弹幕命中立即退场','持续射击消耗武器电容','末段追加复合拦截']}},
@@ -11,7 +12,7 @@ export const waveMeta={
 export const waveIds=Object.keys(waveMeta);
 export function waveTiles(){return waveIds.map(id=>{const m=waveMeta[id];return `<article class="game-tile wave-tile wave-${id}" style="--wave:${m.color}"><span class="game-number">${m.no}</span><div><small>全新挑战</small><h3>${m.title}：${m.accent}</h3><p>${m.desc}</p></div><button data-open-wave="${id}">进入挑战 →</button></article>`}).join('')}
 const modes={plane:[['禁航 180','扇形弹幕 · 追踪弹 · 双 Boss'],['无尽空域','每 30 秒追加一种弹幕'],['本机加压','额外弹幕压力 · 独立计分']],pinball:[['倾斜 180','缩短挡板 · 双球 · 间歇熄灯'],['故障无尽','每轮保留一个永久故障'],['本机加压','额外故障压力 · 独立计分']],train:[['失控 180','对向列车 · 断轨 · 三岔口'],['无尽干线','速度持续增加，车站补制动'],['本机加压','额外车流压力 · 独立计分']],submarine:[['深潜 180','水雷 · 洋流 · 声呐失真'],['海沟无尽','压力递增，能见度恶化'],['本机加压','额外追猎压力 · 独立计分']],skate:[['逃亡 180','碎裂屋顶 · 吊车 · 雨天盲跳'],['屋顶无尽','间距与节奏持续增加'],['本机加压','额外障碍压力 · 独立计分']]};
-export function waveLanding(id){const m=waveMeta[id];return `<main id="main" class="wave-landing wave-theme-${id}" style="--wave:${m.color}"><section class="wave-hero"><div><span class="status"><i></i> 规则序列 V1</span><p class="wave-index">ARCADE / ${m.no}</p><h1>${m.title}<br><span>${m.accent}</span></h1><p>${m.desc}</p><button class="primary" data-wave-start="${id}" data-wave-mode="extreme">挑战炼狱 180 →</button></div><div class="wave-machine" aria-label="${m.title}街机预览"><div class="machine-screen">${id==='plane'?`<img class="plane-character" src="${PLANE_PLAYER_ART_URL}" alt="战战驾驶红白战机，机翼佩戴 LGD 徽标" width="1254" height="1254" decoding="async">`:id==='submarine'?`<img class="submarine-character" src="${SUBMARINE_ART_URL}" alt="战战驾驶黄铜探索潜艇，佩戴 LGD 徽标" width="1607" height="979" decoding="async">`:`<span>${m.icon}</span><i></i><i></i><i></i><b>PHASE 03</b>`}</div><div class="machine-panel"><i></i><b></b><b></b></div></div></section><section class="modes wave-modes"><header><div><span class="kicker">独立规则与记录</span><h2>选择挑战模式</h2></div><p>最后 60 秒进入复合狂暴。</p></header><div class="mode-list">${modes[id].map((x,i)=>`<button class="mode ${i===0?'wave-extreme':''}" data-wave-start="${id}" data-wave-mode="${['extreme','endless','shadow'][i]}"><span class="mode-icon ${i===1?'mint':i===2?'coral':''}">${i===0?'180':i===1?'∞':'↗'}</span><span><b>${x[0]}</b><small>${x[1]}</small></span><em>${i===0?'一命极限挑战':i===1?'独立纪录':'本机加压'}</em></button>`).join('')}</div></section></main>`}
+export function waveLanding(id){const m=waveMeta[id];return `<main id="main" class="wave-landing wave-theme-${id}" style="--wave:${m.color}"><section class="wave-hero"><div><span class="status"><i></i> 规则序列 V1</span><p class="wave-index">ARCADE / ${m.no}</p><h1>${m.title}<br><span>${m.accent}</span></h1><p>${m.desc}</p><button class="primary" data-wave-start="${id}" data-wave-mode="extreme">挑战炼狱 180 →</button></div><div class="wave-machine" aria-label="${m.title}街机预览"><div class="machine-screen">${id==='plane'?`<img class="plane-character" src="${PLANE_PLAYER_ART_URL}" alt="战战驾驶红白战机，机翼佩戴 LGD 徽标" width="1254" height="1254" decoding="async">`:id==='submarine'?`<img class="submarine-character" src="${SUBMARINE_ART_URL}" alt="战战驾驶黄铜探索潜艇，佩戴 LGD 徽标" width="1607" height="979" decoding="async">`:id==='skate'?roleArtPreview('skate','战战踩着滑板向右滑行，保留 LGD 徽标'):id==='train'?roleArtPreview('train','战战驾驶红白机车，向前方轨道行进'):`<span>${m.icon}</span><i></i><i></i><i></i><b>PHASE 03</b>`}</div><div class="machine-panel"><i></i><b></b><b></b></div></div></section><section class="modes wave-modes"><header><div><span class="kicker">独立规则与记录</span><h2>选择挑战模式</h2></div><p>最后 60 秒进入复合狂暴。</p></header><div class="mode-list">${modes[id].map((x,i)=>`<button class="mode ${i===0?'wave-extreme':''}" data-wave-start="${id}" data-wave-mode="${['extreme','endless','shadow'][i]}"><span class="mode-icon ${i===1?'mint':i===2?'coral':''}">${i===0?'180':i===1?'∞':'↗'}</span><span><b>${x[0]}</b><small>${x[1]}</small></span><em>${i===0?'一命极限挑战':i===1?'独立纪录':'本机加压'}</em></button>`).join('')}</div></section></main>`}
 export function waveGameView(id,mode){
  const m=waveMeta[id],u=m.ui,mn={extreme:'炼狱 180',endless:'无尽模式',shadow:'本机加压'}[mode],clock=mode==='endless'?'00:00':'03:00';
  const visibleKeys={plane:['left','up','action','down','right'],pinball:['left','down','right'],train:['left','down','right'],submarine:['left','up','action','down','right'],skate:['left','up','right']}[id];
@@ -64,6 +65,7 @@ export function stopWave(){if(!run)return;cancelAnimationFrame(run.raf);clearInt
 export function mountWave(id,mode,onFinish){stopWave();const canvas=document.querySelector('#wave-canvas');if(!canvas)return;const dpr=Math.min(2,window.devicePixelRatio||1);canvas.width=720*dpr;canvas.height=520*dpr;const c=canvas.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);const s={id,mode,t:mode==='endless'?0:180,phase:1,score:0,res:100,keys:{},p:{x:360,y:430,vx:0,vy:0},items:[],shots:[],tick:0,clockCarry:0,shotCooldown:0,paddleCooldown:0,last:performance.now(),over:false};if(id==='train')s.p.x=1;run=s;
  if(id==='submarine')void loadSubmarineArt();
  if(id==='plane')void loadPlaneArt();
+ if(id==='skate'||id==='train')void loadRoleArt(id);
  const end=(win=false)=>{if(s.over)return;s.over=true;stopWave();onFinish({id,score:s.score,time:mode==='endless'?s.t:180-s.t,win})};
  const keymap=k=>({ArrowLeft:'left',a:'left',ArrowRight:'right',d:'right',ArrowUp:'up',w:'up',ArrowDown:'down',s:'down',' ':'action'}[k]);
  s.keydown=e=>{const k=keymap(e.key);if(k){e.preventDefault();s.keys[k]=true}};s.keyup=e=>{const k=keymap(e.key);if(k)s.keys[k]=false};addEventListener('keydown',s.keydown);addEventListener('keyup',s.keyup);
@@ -97,7 +99,7 @@ function syncHud(s){
  else if(s.id==='pinball'&&s.keys.down){message='震台介入 · 稳定度下降';level='warning'}
  else if(s.id==='train'&&s.keys.down){message='制动介入 · 气压下降';level='warning'}
  else if(s.id==='submarine'&&s.pulse){message='主动声呐已发射';level='active'}
- else if(s.id==='skate'&&!s.p.ground){message='腾空 · 校准落点';level='active'}
+ else if(s.id==='skate'&&!s.ground){message='腾空 · 校准落点';level='active'}
  if(alert){if(alert.textContent!==message)alert.textContent=message;alert.dataset.level=level}
 }
 
@@ -181,9 +183,12 @@ function drawTrainBody(c,x,y,scale,color,player=false){
 }
 function drawTrain(c,s){
  [...s.items].sort((a,b)=>a.y-b.y).forEach(o=>{const p=trainProjection(o.x,o.y);drawTrainBody(c,p.x,p.y,p.scale,'#a84b3b')});
- const playerX=[150,360,570][s.p.x];drawTrainBody(c,playerX,442,1.05,'#384b45',true);
- c.fillStyle='rgba(246,237,202,.8)';c.font='700 11px ui-monospace,monospace';c.textAlign='center';['LINE 1','LINE 2','LINE 3'].forEach((label,index)=>c.fillText(label,[150,360,570][index],503));
- const arrowX=[150,360,570][s.p.x];c.fillStyle='#e2c251';c.beginPath();c.moveTo(arrowX,474);c.lineTo(arrowX-10,488);c.lineTo(arrowX+10,488);c.closePath();c.fill();c.textAlign='start';
+ // Use the actual rail center at the player's depth, not its off-screen near end.
+ const playerY=442,near=[150,360,570],far=[330,360,390],trackT=(playerY-112)/(520-112),playerX=far[s.p.x]+(near[s.p.x]-far[s.p.x])*trackT;
+ // The physical lane index and lower clearance remain unchanged.
+ if(!drawRoleSprite(c,'train',0,playerX-54,380,108,126))drawTrainBody(c,playerX,442,1.05,'#384b45',true);
+ c.fillStyle='rgba(246,237,202,.8)';c.font='700 11px ui-monospace,monospace';c.textAlign='center';['LINE 1','LINE 2','LINE 3'].forEach((label,index)=>c.fillText(label,[150,360,570][index],516));
+ c.textAlign='start';
 }
 function drawSub(c,s){
  c.save();c.strokeStyle='rgba(150,205,187,.14)';c.lineWidth=1;[80,160,240].forEach(r=>{c.beginPath();c.arc(s.p.x,s.p.y,r,0,Math.PI*2);c.stroke()});
@@ -197,6 +202,11 @@ function drawSkate(c,s){
  c.save();
  s.items.forEach(o=>{if(o.type==='gap'){c.fillStyle='#182322';c.fillRect(o.x,446,o.w,74);const edge='#c8a66b';line(c,o.x,446,o.x+12,467,edge,4);line(c,o.x+o.w,446,o.x+o.w-12,467,edge,4);c.fillStyle='rgba(202,169,104,.45)';for(let x=o.x+10;x<o.x+o.w-8;x+=22)c.fillRect(x,449,9,5)}else{c.fillStyle='#393f3c';roundedRect(c,o.x,382,o.w,69,5);c.fill();c.strokeStyle='#1f2825';c.lineWidth=4;c.stroke();c.save();roundedRect(c,o.x,382,o.w,69,5);c.clip();c.strokeStyle='#d3a94e';c.lineWidth=9;for(let x=o.x-55;x<o.x+o.w+40;x+=34)line(c,x,452,x+55,382,c.strokeStyle,9);c.restore();c.fillStyle='#bd4d3b';c.fillRect(o.x+8,389,o.w-16,9)}});
  const shadowWidth=48+Math.min(28,Math.abs(430-s.p.y)*.08);c.fillStyle=`rgba(25,31,29,${.26-Math.min(.18,Math.abs(430-s.p.y)/500)})`;c.beginPath();c.ellipse(s.p.x,456,shadowWidth,7,0,0,Math.PI*2);c.fill();
- c.save();c.translate(s.p.x,s.p.y);const airborne=!s.p.ground,tilt=clamp(s.p.vy/900,-.28,.28);c.rotate(tilt);c.strokeStyle='#2d3734';c.lineCap='round';c.lineWidth=8;c.beginPath();c.arc(0,-42,11,0,Math.PI*2);c.stroke();c.strokeStyle='#efd38d';c.lineWidth=7;c.beginPath();c.moveTo(0,-31);c.lineTo(airborne?6:0,3);c.lineTo(airborne?-22:-16,22);c.moveTo(2,-18);c.lineTo(airborne?26:21,-6);c.moveTo(2,-18);c.lineTo(-19,-7);c.stroke();c.strokeStyle='#252f2d';c.lineWidth=5;line(c,-28,28,31,28,c.strokeStyle,5);c.fillStyle='#d1b252';c.beginPath();c.arc(-20,33,4,0,Math.PI*2);c.arc(22,33,4,0,Math.PI*2);c.fill();c.restore();
- c.fillStyle='rgba(244,226,182,.7)';c.font='700 10px ui-monospace,monospace';c.fillText(s.p.ground?'CONTACT / STABLE':'AIRBORNE / ALIGN',24,34);c.restore();
+ c.save();c.translate(s.p.x,s.p.y);const airborne=!s.ground,tilt=clamp(s.p.vy/900,-.28,.28);c.rotate(tilt);
+ // Square frames keep the wheel contact line at the original local y + 37.
+ if(!drawRoleSprite(c,'skate',airborne?1:0,-46,-55,92,92)){
+  c.strokeStyle='#2d3734';c.lineCap='round';c.lineWidth=8;c.beginPath();c.arc(0,-42,11,0,Math.PI*2);c.stroke();c.strokeStyle='#efd38d';c.lineWidth=7;c.beginPath();c.moveTo(0,-31);c.lineTo(airborne?6:0,3);c.lineTo(airborne?-22:-16,22);c.moveTo(2,-18);c.lineTo(airborne?26:21,-6);c.moveTo(2,-18);c.lineTo(-19,-7);c.stroke();c.strokeStyle='#252f2d';c.lineWidth=5;line(c,-28,28,31,28,c.strokeStyle,5);c.fillStyle='#d1b252';c.beginPath();c.arc(-20,33,4,0,Math.PI*2);c.arc(22,33,4,0,Math.PI*2);c.fill();
+ }
+ c.restore();
+ c.fillStyle='rgba(244,226,182,.7)';c.font='700 10px ui-monospace,monospace';c.fillText(s.ground?'CONTACT / STABLE':'AIRBORNE / ALIGN',24,34);c.restore();
 }

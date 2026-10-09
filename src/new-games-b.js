@@ -1,3 +1,5 @@
+import {loadRoleArt,drawRoleSprite,roleArtPreview} from './role-art.js';
+
 export const newGameMetaB = {
   courier: {
     no: '16', title: '时光快递', accent: '逆行都市', code: 'COURIER / CX-4', color: '#b76536',
@@ -60,7 +62,7 @@ export function newGameLandingB(id) {
         <h1>${m.title}<br><span>${m.accent}</span></h1><p>${m.desc}</p>
         <button class="primary" data-start-new-b="${id}" data-new-b-mode="extreme">挑战炼狱 180 →</button>
       </div>
-      <div class="wave-machine" aria-label="${m.title}街机预览"><div class="machine-screen"><span style="font-size:clamp(22px,4vw,44px)">${m.code.split(' / ')[1]}</span><i></i><i></i><i></i><b>PHASE 03</b></div><div class="machine-panel"><i></i><b></b><b></b></div></div>
+      <div class="wave-machine" aria-label="${m.title}街机预览"><div class="machine-screen">${id==='courier'?roleArtPreview('courier','战战驾驶配送车穿行都市，保留 LGD 徽标'):id==='stealth'?roleArtPreview('stealth','战战携带干扰装置潜入警戒区，保留 LGD 徽标'):`<span style="font-size:clamp(22px,4vw,44px)">${m.code.split(' / ')[1]}</span><i></i><i></i><i></i><b>PHASE 03</b>`}</div><div class="machine-panel"><i></i><b></b><b></b></div></div>
     </section>
     <section class="modes wave-modes"><header><div><span class="kicker">独立规则与真实事件计分</span><h2>选择挑战模式</h2></div><p>每局都有三段压力，后 60 秒叠加全部失败条件。</p></header>
       <div class="mode-list">${modeCopy[id].map((x, i) => `<button class="mode ${i === 0 ? 'wave-extreme' : ''}" data-start-new-b="${id}" data-new-b-mode="${['extreme', 'endless', 'shadow'][i]}"><span class="mode-icon ${i === 1 ? 'mint' : i === 2 ? 'coral' : ''}">${i === 0 ? '180' : i === 1 ? '∞' : '++'}</span><span><b>${x[0]}</b><small>${x[1]}</small></span><em>${i === 0 ? '一命极限挑战' : i === 1 ? '独立纪录' : '本机规则'}</em></button>`).join('')}</div>
@@ -94,6 +96,19 @@ export function newGameViewB(id, mode = 'extreme') {
 }
 
 let activeRunB = null;
+// Presentation-only facing memory. Never add art fields to simulation state.
+const roleFacingB = new WeakMap();
+function movingRoleFrame(s) {
+  const previous=roleFacingB.get(s),dx=previous?s.p.x-previous.x:0,dy=previous?s.p.y-previous.y:0;
+  let frame=previous?.frame??0;
+  if(Math.hypot(dx,dy)>96)frame=0; // A new room resets the pose rather than turning during a teleport.
+  else if(Math.abs(dx)>.001||Math.abs(dy)>.001){
+    if(Math.abs(dx)>Math.abs(dy))frame=dx>0?1:3;
+    else frame=dy>0?2:0;
+  }
+  roleFacingB.set(s,{x:s.p.x,y:s.p.y,frame});
+  return frame;
+}
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 const intersects = (a, b, pad = 0) => a.x + (a.w || 0) > b.x - pad && a.x < b.x + (b.w || 0) + pad && a.y + (a.h || 0) > b.y - pad && a.y < b.y + (b.h || 0) + pad;
@@ -135,6 +150,7 @@ export function mountNewGameB(id, mode, onFinish) {
   const dpr = Math.min(2, window.devicePixelRatio || 1);
   canvas.width = 720 * dpr; canvas.height = 520 * dpr;
   const c = canvas.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  if(id==='courier'||id==='stealth')void loadRoleArt(id);
   const s = createBaseState(id, mode); activeRunB = s;
   initialiseGame(s);
 
@@ -365,7 +381,11 @@ function drawCourier(c, s) {
   c.setLineDash([12, 13]); for (let x = 47; x < 720; x += 92) line(c, x, 0, x, 520, 'rgba(226,206,132,.34)'); for (let y = 42; y < 520; y += 88) line(c, 0, y, 720, y, 'rgba(226,206,132,.34)'); c.setLineDash([]);
   s.depots.forEach((point, index) => { const active = index === (s.carrying ? s.destination : s.pickup); circle(c, point.x, point.y, active ? 18 : 11, active ? '#e1b956' : '#728179', '#f1dcc0', 2); label(c, active ? (s.carrying ? '交付' : '取件') : `D${index + 1}`, point.x, point.y + 35, active ? '#f4d16c' : '#9da8a1', 10, 'center'); });
   for (const car of s.items) { c.save(); c.translate(car.x, car.y); c.fillStyle = car.near ? '#c57242' : '#8c5141'; c.fillRect(0, 0, car.w, car.h); c.fillStyle = '#c9d0ba'; if (car.w > car.h) { c.fillRect(12, 4, car.w - 24, car.h - 8); } else c.fillRect(4, 12, car.w - 8, car.h - 24); c.restore(); }
-  c.save(); c.translate(s.p.x, s.p.y); c.globalAlpha = s.invulnerable > 0 && Math.floor(s.invulnerable * 12) % 2 ? .25 : 1; c.fillStyle = '#e5c154'; c.fillRect(-12, -17, 24, 34); c.fillStyle = '#22302c'; c.fillRect(-8, -10, 16, 14); c.fillStyle = '#d95b45'; c.fillRect(-9, 12, 5, 3); c.fillRect(4, 12, 5, 3); c.restore();
+  c.save(); c.translate(s.p.x, s.p.y); c.globalAlpha = s.invulnerable > 0 && Math.floor(s.invulnerable * 12) % 2 ? .25 : 1;
+  if(!drawRoleSprite(c,'courier',movingRoleFrame(s),-20,-24,40,48)){
+    c.fillStyle = '#e5c154'; c.fillRect(-12, -17, 24, 34); c.fillStyle = '#22302c'; c.fillRect(-8, -10, 16, 14); c.fillStyle = '#d95b45'; c.fillRect(-9, 12, 5, 3); c.fillRect(4, 12, 5, 3);
+  }
+  c.restore();
   label(c, s.carrying ? `包裹时限 ${Math.max(0, s.packageTime).toFixed(1)}s` : '前往高亮站点取件', 20, 30, '#f0d276', 12);
 }
 
@@ -375,7 +395,8 @@ function drawStealth(c, s) {
   for (const area of s.cover) { c.fillStyle = '#263c34'; c.fillRect(area.x, area.y, area.w, area.h); c.strokeStyle = '#668778'; c.strokeRect(area.x, area.y, area.w, area.h); label(c, '掩体', area.x + 8, area.y + 18, '#9bb6a8', 9); }
   for (const guard of s.guards) { const range = 160 + s.phase * 14, cone = .42 + s.phase * .09; c.fillStyle = 'rgba(214,175,80,.11)'; c.beginPath(); c.moveTo(guard.x, guard.y); c.arc(guard.x, guard.y, range, guard.angle - cone, guard.angle + cone); c.closePath(); c.fill(); circle(c, guard.x, guard.y, 11, '#bd714d', '#e5c787', 2); line(c, guard.x, guard.y, guard.x + Math.cos(guard.angle) * 23, guard.y + Math.sin(guard.angle) * 23, '#f5d889', 3); }
   circle(c, s.terminal.x, s.terminal.y, 21, '#364a45', '#8dc0a6', 3); label(c, `${Math.floor(s.hack)}%`, s.terminal.x, s.terminal.y + 4, '#cde4d2', 10, 'center');
-  circle(c, s.p.x, s.p.y, 10, '#d8c25c', '#f3e8b5', 2); if (s.jammer > 0) circle(c, s.p.x, s.p.y, 28, 'rgba(0,0,0,0)', '#9dd6c4', 2);
+  if(!drawRoleSprite(c,'stealth',movingRoleFrame(s),s.p.x-20,s.p.y-22,40,44))circle(c, s.p.x, s.p.y, 10, '#d8c25c', '#f3e8b5', 2);
+  if (s.jammer > 0) circle(c, s.p.x, s.p.y, 28, 'rgba(0,0,0,0)', '#9dd6c4', 2);
   label(c, `暴露 ${Math.round(s.exposure)}%  /  警报 ${s.alarms}/3  /  干扰 ${Math.round(s.battery)}%`, 18, 28, '#b9cec2', 11);
 }
 

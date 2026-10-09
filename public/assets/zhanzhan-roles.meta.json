@@ -1,0 +1,144 @@
+{
+  "generator": "built-in image_gen",
+  "transparentBackground": true,
+  "referenceImages": [
+    "/assets/zhanzhan-platformer-lgd.png",
+    "/assets/lgd-logo.png"
+  ],
+  "roles": {
+    "skate": {
+      "url": "/assets/zhanzhan-skate.png",
+      "width": 1774,
+      "height": 887,
+      "columns": 2,
+      "rows": 1,
+      "previewFrame": 0,
+      "align": "bottom",
+      "frames": [
+        [
+          144,
+          28,
+          700,
+          828
+        ],
+        [
+          994,
+          33,
+          679,
+          755
+        ]
+      ]
+    },
+    "goalie": {
+      "url": "/assets/zhanzhan-goalie.png",
+      "width": 1254,
+      "height": 1254,
+      "columns": 1,
+      "rows": 1,
+      "previewFrame": 0,
+      "align": "bottom",
+      "frames": [
+        [
+          58,
+          52,
+          1138,
+          1144
+        ]
+      ]
+    },
+    "courier": {
+      "url": "/assets/zhanzhan-courier.png",
+      "width": 1254,
+      "height": 1254,
+      "columns": 2,
+      "rows": 2,
+      "previewFrame": 2,
+      "align": "center",
+      "frames": [
+        [
+          149,
+          34,
+          351,
+          577
+        ],
+        [
+          701,
+          39,
+          512,
+          547
+        ],
+        [
+          149,
+          639,
+          348,
+          581
+        ],
+        [
+          692,
+          643,
+          520,
+          546
+        ]
+      ]
+    },
+    "stealth": {
+      "url": "/assets/zhanzhan-stealth.png",
+      "width": 1254,
+      "height": 1254,
+      "columns": 2,
+      "rows": 2,
+      "previewFrame": 2,
+      "align": "center",
+      "frames": [
+        [
+          133,
+          25,
+          421,
+          581
+        ],
+        [
+          711,
+          46,
+          477,
+          557
+        ],
+        [
+          142,
+          660,
+          416,
+          562
+        ],
+        [
+          753,
+          664,
+          442,
+          550
+        ]
+      ]
+    },
+    "train": {
+      "url": "/assets/zhanzhan-train.png",
+      "width": 1254,
+      "height": 1254,
+      "columns": 1,
+      "rows": 1,
+      "previewFrame": 0,
+      "align": "bottom",
+      "frames": [
+        [
+          299,
+          57,
+          653,
+          1108
+        ]
+      ]
+    }
+  },
+  "prompts": {
+    "skate": "Use case: stylized-concept. Production transparent game sprite. Image 1 is the exact identity/style reference for Zhanzhan the red dragon, not a layout to copy; image 2 is his exact LGD circular emblem. Preserve red head/body, three prominent black horns/crest, large amber eyes, white muzzle and white belly with the LGD badge, white gloves, red-white shoes, small silver-red wings, red tail with white stripe. Premium polished 2.5D collectible-toy game illustration, controlled glossy red highlights, crisp silhouette, no flat icon. True RGBA transparency, no scene, no ground, no shadow, no podium, no labels, no added text except emblem, no watermark, no glow. Create one 2-column 1-row sprite sheet, wide 2:1 canvas, each cell square with equal margins. Exactly TWO full-body side/three-quarter views facing screen RIGHT. LEFT: balanced skating stance, bent knees, arms naturally out, both feet on a short red-white skateboard with graphite deck and four cream wheels. RIGHT: compact ollie/jump with knees tucked, both feet still holding the skateboard, arms balancing, board nearly horizontal. Character and board face right in BOTH. Same camera, scale and lighting. Whole horns/tail/board visible. 10% transparent margins each cell; no overlap across cells. On each cell show entire character and entire board, no ramps. Athletic lively expression, LGD visible on belly.",
+    "goalie": "Use case: stylized-concept. Production transparent game sprite. Image 1 is the exact identity/style reference for Zhanzhan the red dragon, not a layout to copy; image 2 is his exact LGD circular emblem. Preserve red head/body, three prominent black horns/crest, large amber eyes, white muzzle and white belly with the LGD badge, white gloves, red-white shoes, small silver-red wings, red tail with white stripe. Premium polished 2.5D collectible-toy game illustration, controlled glossy red highlights, crisp silhouette, no flat icon. True RGBA transparency, no scene, no ground, no shadow, no podium, no labels, no added text except emblem, no watermark, no glow. Create ONE full-body FRONT facing goalkeeper in ready stance, knees bent, feet apart, large padded white goalkeeper gloves raised outward at shoulder height, eyes focused forward, smiling determined. Add subtle navy wrist cuffs and knee pads, leave white belly and accurate LGD badge visible. Fold small wings close behind, tail tucked. Full body including horns and feet, centered, 8% transparent padding. No football (the game renders the ball separately), no goal, no field, no extra people. Strong symmetrical compact silhouette, hands and feet clearly visible at 100 px tall.",
+    "courier": "Use case: stylized-concept. Production transparent game sprite. Image 1 is the exact identity/style reference for Zhanzhan the red dragon, not a layout to copy; image 2 is his exact LGD circular emblem. Preserve red head/body, three prominent black horns/crest, large amber eyes, white muzzle and white belly with the LGD badge, white gloves, red-white shoes, small silver-red wings, red tail with white stripe. Premium polished 2.5D collectible-toy game illustration, controlled glossy red highlights, crisp silhouette, no flat icon. True RGBA transparency, no scene, no ground, no shadow, no podium, no labels, no added text except emblem, no watermark, no glow. Create ONE square 2x2 FOUR DIRECTION sprite atlas of Zhanzhan seated on a compact red-ivory delivery scooter with a small mustard parcel case fixed behind the seat. He steers the handlebars with BOTH white gloves. Camera fixed 65 degrees down from above, orthographic high angle. TOP LEFT: heading screen UP, rear view, scooter nose/front wheel at top; TOP RIGHT: heading RIGHT side view; BOTTOM LEFT: heading DOWN front view with face and chest LGD visible; BOTTOM RIGHT: heading LEFT side view. Do not rotate one front picture; render four actual views of same driver and scooter. Same scale, compact nearly square total silhouettes inside each equal quadrant. 10% transparent gutters, whole wheels/horns/tail visible, no overlap. Tiny scooter headlight, honest tire and parcel details. Legible at 40 pixels; no delivery words or labels. Character remains red in all views. No other props.",
+    "stealth": "Use case: stylized-concept. Production transparent game sprite. Image 1 is the exact identity/style reference for Zhanzhan the red dragon, not a layout to copy; image 2 is his exact LGD circular emblem. Preserve red head/body, three prominent black horns/crest, large amber eyes, white muzzle and white belly with the LGD badge, white gloves, red-white shoes, small silver-red wings, red tail with white stripe. Premium polished 2.5D collectible-toy game illustration, controlled glossy red highlights, crisp silhouette, no flat icon. True RGBA transparency, no scene, no ground, no shadow, no podium, no labels, no added text except emblem, no watermark, no glow. Create ONE square 2x2 FOUR DIRECTION sprite atlas of a compact crouching stealth scout Zhanzhan. Camera fixed high angle 60 degrees down, orthographic. TOP LEFT faces UP rear view; TOP RIGHT faces RIGHT side view; BOTTOM LEFT faces DOWN front view; BOTTOM RIGHT faces LEFT side view. Actual natural 3D directional turns, not rotating a flat face. Identical scale and lighting. Low crouched sneaking stance, one foot forward, arms bent, small graphite utility harness and wrist communicator, tiny teal goggles lifted on forehead so amber eyes visible. White belly and LGD stay visible at front. No guns, no weapons, no cape. Wings folded close and tail tucked, complete silhouette inside each cell with 10% transparent margins. Character mostly red/white; equipment modest. No glows, circles or floor markings. Full horns and feet visible. Readable at 40 pixels.",
+    "train": "Use case: stylized-concept. Production transparent game sprite. Image 1 is the exact identity/style reference for Zhanzhan the red dragon, not a layout to copy; image 2 is his exact LGD circular emblem. Preserve red head/body, three prominent black horns/crest, large amber eyes, white muzzle and white belly with the LGD badge, white gloves, red-white shoes, small silver-red wings, red tail with white stripe. Premium polished 2.5D collectible-toy game illustration, controlled glossy red highlights, crisp silhouette, no flat icon. True RGBA transparency, no scene, no ground, no shadow, no podium, no labels, no added text except emblem, no watermark, no glow. Create ONE compact red and ivory toy-style electric locomotive with Zhanzhan driving in a partially OPEN cab, viewed from HIGH REAR three-quarter angle looking forward toward screen TOP. Locomotive longitudinal axis strictly vertical, NOSE and front face point screen UP and away, REAR coupler, red tail lamps and rear deck near screen BOTTOM. This is the PLAYER moving away into the distance, not an oncoming front view. Rounded industrial shell, ivory center roof stripe, graphite undercarriage and compact rail wheels, subtle brass controls, mechanical vents and paneled metal texture. Open rear upper cab reveals Zhanzhan seated facing up, black horns/red head and a little white cheek in side glance, white gloves on train controls; character seated naturally INSIDE not standing on roof. LGD emblem on rear panel and cab side. Short single locomotive only, no cars attached, no rails, no smoke. Near-square canvas; fill 86% with entire train/horns/wheels visible, equal transparent margins. Readable at 108x126px."
+  }
+}

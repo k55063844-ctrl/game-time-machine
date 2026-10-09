@@ -989,3 +989,9 @@ body[data-page$="game"]:before{
 .wave-theme-submarine .machine-screen .submarine-character{display:block;width:94%;height:auto;max-height:100%;object-fit:contain;position:relative;z-index:1;filter:drop-shadow(0 8px 12px rgba(8,23,27,.28))}
 .wave-theme-plane .machine-screen{background:#b0c3be}
 .wave-theme-plane .machine-screen .plane-character{display:block;width:74%;height:auto;max-height:96%;object-fit:contain;position:relative;z-index:1;filter:drop-shadow(0 6px 5px rgba(38,54,49,.2))}
+.machine-screen .role-art-preview{display:block;position:relative;z-index:1;width:82%;height:92%;overflow:hidden;filter:drop-shadow(0 5px 5px rgba(28,43,36,.2))}
+.wave-theme-skate .machine-screen{background:#d9a57e}
+.wave-theme-train .machine-screen{background:#b7baa3}
+.ng-theme-courier .machine-screen{background:#d6bd96}
+.ng-theme-stealth .machine-screen{background:#7d9a87}
+.ng-landing:has(.role-art-goalie) .machine-screen{background:#a5b590}
