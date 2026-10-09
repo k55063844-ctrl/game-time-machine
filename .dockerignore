@@ -1,0 +1,7 @@
+*
+!Dockerfile.nas
+!deploy/
+!deploy/nas/
+!deploy/nas/nginx.conf
+!dist/
+!dist/**
